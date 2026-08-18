@@ -300,40 +300,6 @@ The UI follows a mobile-first responsive approach to provide a consistent experi
 
 ---
 
-## 🚧 Current Limitations
-
-Iron Forge is currently a **frontend-only project**, so it does not include:
-
-* ❌ Backend server
-* ❌ Database
-* ❌ Real user accounts
-* ❌ Secure authentication
-* ❌ Cloud data synchronization
-* ❌ Server-side API key protection
-
-These limitations are intentional for the current version of the project.
-
----
-
-## 🔮 Future Improvements
-
-Potential future development includes:
-
-* [ ] Backend API
-* [ ] User accounts and secure authentication
-* [ ] Database integration
-* [ ] Cloud-based progress synchronization
-* [ ] Personalized workout generation
-* [ ] AI-powered fitness recommendations
-* [ ] Secure server-side food analysis
-* [ ] Workout history and analytics dashboard
-* [ ] Trainer management system
-* [ ] Subscription and membership system
-* [ ] Admin dashboard
-* [ ] Real-time notifications
-
----
-
 ## 🎯 Project Goals
 
 Iron Forge was designed to demonstrate how a modern fitness platform can be built using **core web technologies without relying on a frontend framework**.
