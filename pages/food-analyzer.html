@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محلل الأكل بالصورة | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .upload-box{
+    border:2px dashed var(--border); border-radius: var(--radius); padding:40px 20px; text-align:center;
+    cursor:pointer; transition: border-color .2s ease, background .2s ease; background: var(--surface-alt);
+  }
+  .upload-box:hover{ border-color: var(--accent); }
+  #previewImg{ max-height:260px; border-radius: var(--radius); margin:0 auto 18px; display:none; }
+  .confidence-tag{ font-size:.78rem; color:var(--text-faint); margin-top:6px; }
+</style>
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="محلل الأكل" data-en="Food Analyzer">محلل الأكل</div>
+    <h1 data-ar="اعرف سعرات أكلك من صورة واحدة" data-en="Know your meal's calories from a single photo">اعرف سعرات أكلك من صورة واحدة</h1>
+    <p data-ar="ارفع صورة الوجبة، وذكاء اصطناعي شغال جوه متصفحك هيقولك السعرات والمكونات التقريبية — بدون أي حد لعدد المرات." data-en="Upload a photo of your meal, and an AI running right in your browser will estimate calories and ingredients — with no usage limit.">ارفع صورة الوجبة، وذكاء اصطناعي شغال جوه متصفحك هيقولك السعرات والمكونات التقريبية — بدون أي حد لعدد المرات.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container" style="max-width:640px;">
+      <div class="card">
+        <img id="previewImg" alt="preview">
+        <div class="upload-box" id="uploadBox">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="margin:0 auto 12px; color:var(--text-dim);">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/>
+          </svg>
+          <p style="margin-bottom:4px; color:var(--text);" data-ar="اضغط لرفع صورة أو التقاطها بالكاميرا" data-en="Tap to upload or take a photo">اضغط لرفع صورة أو التقاطها بالكاميرا</p>
+          <p style="font-size:.8rem;" data-ar="JPG, PNG — حتى 10MB" data-en="JPG, PNG — up to 10MB">JPG, PNG — حتى 10MB</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
+        <button class="btn btn-primary btn-block hidden" id="analyzeBtn" style="margin-top:18px;" data-ar="حلّل الصورة" data-en="Analyze Photo">حلّل الصورة</button>
+
+        <div id="loadingBox" class="hidden text-center" style="margin-top:24px;">
+          <div class="spinner"></div>
+          <p style="margin-top:14px;" id="loadingText" data-ar="جاري تحليل الصورة..." data-en="Analyzing your photo...">جاري تحليل الصورة...</p>
+        </div>
+
+        <div id="resultBox" class="hidden" style="margin-top:24px;"></div>
+        <div id="errorBox" class="hidden" style="margin-top:18px;"></div>
+      </div>
+
+      <div class="alert alert-info" style="margin-top:24px;" data-ar="ℹ️ الميزة دي بتشتغل بالكامل جوه متصفحك بنموذج ذكاء اصطناعي مفتوح المصدر (بدون سيرفر وبدون API Key)، فمفيش أي حد لعدد المرات وهتفضل شغالة دايمًا ومجانًا. أول استخدام بس بياخد وقت أطول شوية عشان تنزيل النموذج (~16 ميجا) لمرة واحدة." data-en="ℹ️ This feature runs entirely in your browser using an open-source AI model (no server, no API key), so there's no usage limit and it stays free forever. The first use takes a bit longer to download the model (~16MB) once.">
+        ℹ️ الميزة دي بتشتغل بالكامل جوه متصفحك بنموذج ذكاء اصطناعي مفتوح المصدر (بدون سيرفر وبدون API Key)، فمفيش أي حد لعدد المرات وهتفضل شغالة دايمًا ومجانًا. أول استخدام بس بياخد وقت أطول شوية عشان تنزيل النموذج (~16 ميجا) لمرة واحدة.
+      </div>
+      <div class="alert alert-warning" style="margin-top:12px;" data-ar="⚠️ النتيجة تقديرية اعتمادًا على نموذج تصنيف صور عام، مش بديل لاستشارة أخصائي تغذية." data-en="⚠️ Results are estimates from a general-purpose image classifier, not a substitute for professional dietary advice.">
+        ⚠️ النتيجة تقديرية اعتمادًا على نموذج تصنيف صور عام، مش بديل لاستشارة أخصائي تغذية.
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/food-analyzer.js"></script>
+<script>
+  let selectedFile = null;
+  const uploadBox = document.getElementById('uploadBox');
+  const fileInput = document.getElementById('fileInput');
+  const previewImg = document.getElementById('previewImg');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const loadingBox = document.getElementById('loadingBox');
+  const loadingText = document.getElementById('loadingText');
+  const resultBox = document.getElementById('resultBox');
+  const errorBox = document.getElementById('errorBox');
+
+  // يبدأ تحميل النموذج بهدوء في الخلفية من أول ما الصفحة تفتح
+  loadFoodModel().catch(()=>{});
+
+  uploadBox.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', ()=>{
+    const file = fileInput.files[0];
+    if(!file) return;
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = ()=>{ previewImg.src = reader.result; previewImg.style.display='block'; };
+    reader.readAsDataURL(file);
+    analyzeBtn.classList.remove('hidden');
+    resultBox.classList.add('hidden');
+    errorBox.classList.add('hidden');
+  });
+
+  analyzeBtn.addEventListener('click', async ()=>{
+    if(!selectedFile || !previewImg.complete) return;
+    const lang = IF.getLang();
+    resultBox.classList.add('hidden');
+    errorBox.classList.add('hidden');
+    loadingText.textContent = _mobilenetModel
+      ? (lang==='ar' ? 'جاري تحليل الصورة...' : 'Analyzing your photo...')
+      : (lang==='ar' ? 'جاري تحميل نموذج الذكاء الاصطناعي لأول مرة...' : 'Downloading the AI model for the first time...');
+    loadingBox.classList.remove('hidden');
+    analyzeBtn.disabled = true;
+
+    try{
+      const data = await analyzeFoodImage(previewImg, lang);
+      loadingBox.classList.add('hidden');
+      analyzeBtn.disabled = false;
+
+      const warningMsgs = {
+        high_calorie: { ar:'⚠️ هذا الطعام مرتفع السعرات، حاول تقليل الكمية أو موازنته مع باقي وجبات اليوم.', en:'⚠️ This meal is high in calories — consider a smaller portion or balancing it with the rest of your day.' },
+        high_sugar: { ar:'⚠️ نسبة الكارب/السكر مرتفعة في هذه الوجبة.', en:'⚠️ This meal is high in carbs/sugar.' },
+        high_satfat: { ar:'⚠️ نسبة الدهون مرتفعة، حاول تقليلها في باقي اليوم.', en:'⚠️ Fat content is high — try to reduce it for the rest of the day.' },
+      };
+      const warningsHTML = data.warnings.map(w => `<div class="alert alert-warning">${lang==='ar'?warningMsgs[w].ar:warningMsgs[w].en}</div>`).join('');
+
+      resultBox.classList.remove('hidden');
+      resultBox.innerHTML = `
+        <h3 style="font-size:1.1rem;">${data.name}</h3>
+        <div class="confidence-tag">${lang==='ar'?`نسبة الثقة في التصنيف: ${data.confidence}%`:`Classification confidence: ${data.confidence}%`}</div>
+        <div class="grid grid-4" style="text-align:center; margin:16px 0;">
+          <div><div style="font-weight:800; font-size:1.3rem;">${data.calories}</div><div class="stat-label">${lang==='ar'?'سعرة':'kcal'}</div></div>
+          <div><div style="font-weight:800; font-size:1.3rem;">${data.protein}g</div><div class="stat-label">${lang==='ar'?'بروتين':'Protein'}</div></div>
+          <div><div style="font-weight:800; font-size:1.3rem;">${data.carbs}g</div><div class="stat-label">${lang==='ar'?'كارب':'Carbs'}</div></div>
+          <div><div style="font-weight:800; font-size:1.3rem;">${data.fat}g</div><div class="stat-label">${lang==='ar'?'دهون':'Fat'}</div></div>
+        </div>
+        ${warningsHTML || `<div class="alert alert-success">${lang==='ar'?'الوجبة دي متوازنة نسبيًا 👍':'This meal looks fairly balanced 👍'}</div>`}
+      `;
+    }catch(err){
+      loadingBox.classList.add('hidden');
+      analyzeBtn.disabled = false;
+      errorBox.classList.remove('hidden');
+      let msg;
+      if(err.message === 'NOT_FOOD_RECOGNIZED'){
+        msg = lang==='ar'
+          ? 'معرفناش نتعرف على أكلة معينة في الصورة دي بثقة كافية. جرب صورة أوضح وأقرب للطبق، أو إضاءة أحسن.'
+          : "We couldn't confidently recognize a specific dish in this photo. Try a clearer, closer shot with better lighting.";
+      } else {
+        msg = lang==='ar'
+          ? 'حصل خطأ أثناء تحميل نموذج الذكاء الاصطناعي أو تحليل الصورة. تأكد من اتصالك بالإنترنت وحاول تاني.'
+          : 'Something went wrong loading the AI model or analyzing the photo. Check your internet connection and try again.';
+      }
+      errorBox.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>من نحن | آيرون فورج</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    /* ---- تنسيق عام للصفحة ---- */
+    .about-intro-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-dim);
+      max-width: 600px;
+      margin: 0 auto 30px;
+      text-align: center;
+    }
+
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    /* ---- الصورة الجديدة ---- */
+    .profile-image-wrapper {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      /* عشان المستخدم يعرف إنها قابلة للنقر */
+
+      /* أنيميشن دخول الصورة */
+      opacity: 0;
+      animation: imageReveal 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation-delay: 0.2s;
+    }
+
+    @keyframes imageReveal {
+      0% {
+        opacity: 0;
+        transform: scale(0.7) rotate(-6deg);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    .profile-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--bg);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* حركة خفيفة لما يقف عليها الماوس */
+    .profile-image-wrapper:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ---- تنسيق النصوص ---- */
+    .profile-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .profile-title {
+      font-size: 1rem;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: inline-block;
+      padding: 6px 16px;
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      border-radius: 999px;
+    }
+
+    .profile-bio {
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .profile-card {
+        padding: 30px 20px;
+      }
+
+      .profile-image-wrapper {
+        width: 170px;
+        height: 170px;
+      }
+
+      .profile-name {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* =========================================
+     ميزة تكبير الصورة (Lightbox Modal)
+     ========================================= */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .image-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .image-modal-content {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      object-fit: contain;
+    }
+
+    .image-modal.active .image-modal-content {
+      transform: scale(1);
+    }
+
+    .image-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      z-index: 10;
+      line-height: 1;
+    }
+
+    .image-modal-close:hover,
+    .image-modal-close:focus {
+      color: var(--accent);
+      transform: rotate(90deg);
+    }
+
+    /* إصلاح اتجاه زر الإغلاق لو اللغة عربي */
+    html[dir="rtl"] .image-modal-close {
+      right: auto;
+      left: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar-root"></div>
+
+  <main>
+    <section class="page-hero container" data-aos="fade-down">
+      <div class="eyebrow" style="justify-content:center;" data-ar="قصتنا" data-en="Our Story">قصتنا</div>
+      <h1 data-ar="من نحن" data-en="About Us">من نحن</h1>
+    </section>
+
+    <section class="section-tight">
+      <div class="container">
+
+        <div class="about-intro-text" data-aos="fade-up" data-aos-delay="100">
+          <p data-ar="آيرون فورج مش مجرد جيم، هو مجتمع بيؤمن إن الرياضة مش رفاهية، هي أسلوب حياة. من أول يوم اشتغلنا على إن كل عضو يلاقي كل حاجة محتاجها في مكان واحد: تمارين، تغذية، متابعة، وناس تشجعه يكمل."
+            data-en="Iron Forge isn't just a gym — it's a community that believes fitness is a lifestyle, not a luxury. From day one, we've worked to make sure every member finds everything they need in one place: training, nutrition, tracking, and people who keep them going.">
+            آيرون فورج مش مجرد جيم، هو مجتمع بيؤمن إن الرياضة مش رفاهية، هي أسلوب حياة. من أول يوم اشتغلنا على إن كل عضو
+            يلاقي كل حاجة محتاجها في مكان واحد: تمارين، تغذية، متابعة، وناس تشجعه يكمل.
+          </p>
+        </div>
+
+        <!-- كارت المؤسس -->
+        <div class="profile-card" data-aos="fade-up" data-aos-delay="200">
+
+          <!-- الصورة القابلة للنقر -->
+          <div class="profile-image-wrapper" id="profileImageBtn">
+            <!-- تأكد أن مسار الصورة صحيح -->
+            <img src="../images/abdelrahman.jpg" alt="عبدالرحمن إبراهيم سفيان">
+          </div>
+
+          <h2 class="profile-name" data-ar="عبدالرحمن إبراهيم سفيان" data-en="Abdelrahman Ibrahim Sofyan">عبدالرحمن
+            إبراهيم سفيان</h2>
+          <div class="profile-title" data-ar="المؤسس والمدير العام" data-en="Founder & General Manager">المؤسس والمدير
+            العام</div>
+
+          <p class="profile-bio"
+            data-ar="أسس آيرون فورج بهدف بناء مكان رياضي حقيقي يهتم بكل عضو كأنه الوحيد، ويوفر له كل أداة يحتاجها في رحلته الرياضية."
+            data-en="Founded Iron Forge to build a genuine fitness space that treats every member like they matter, with every tool they need for their athletic journey.">
+            أسس آيرون فورج بهدف بناء مكان رياضي حقيقي يهتم بكل عضو كأنه الوحيد، ويوفر له كل أداة يحتاجها في رحلته
+            الرياضية.
+          </p>
+        </div>
+
+        <div class="divider-plates" data-aos="fade-in"><span></span><span></span><span></span></div>
+
+        <!-- إحصائيات الموقع -->
+        <div class="grid grid-4" data-aos="fade-up">
+          <div class="card text-center">
+            <div class="stat-num" data-count="2018">0</div>
+            <div class="stat-label" data-ar="سنة التأسيس" data-en="Founded in">سنة التأسيس</div>
+          </div>
+          <div class="card text-center">
+            <div class="stat-num" data-count="1200" data-suffix="+">0</div>
+            <div class="stat-label" data-ar="عضو نشط" data-en="Active members">عضو نشط</div>
+          </div>
+          <div class="card text-center">
+            <div class="stat-num" data-count="18" data-suffix="+">0</div>
+            <div class="stat-label" data-ar="مدرب محترف" data-en="Pro trainers">مدرب محترف</div>
+          </div>
+          <div class="card text-center">
+            <div class="stat-num" data-count="3">0</div>
+            <div class="stat-label" data-ar="فروع" data-en="Branches">فروع</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <!-- =========================================
+     مودال تكبير الصورة (خفية)
+     ========================================= -->
+  <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImg" src="../images/abdelrahman.jpg" alt="صورة عبدالرحمن مكبرة">
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- سكريبت تشغيل التكبير والتصغير -->
+  <script>
+    // عناصر الصفحة
+    const profileBtn = document.getElementById('profileImageBtn');
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+
+    // لما يضغط على الصورة
+    profileBtn.addEventListener('click', function () {
+      modal.classList.add('active');
+      // (اختياري) لو حبيت الصورة تكون بجودة عالية جداً لما تتفتح
+      // modalImg.src = this.querySelector('img').src; 
+    });
+
+    // دالة إغلاق المودال
+    function closeImageModal() {
+      modal.classList.remove('active');
+    }
+
+    // إغلاق المودال لو ضغط Esc من الكيبورد
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeImageModal();
+      }
+    });
+  </script>
+
+</body>
+
+</html>

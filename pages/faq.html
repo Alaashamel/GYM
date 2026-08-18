@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأسئلة الشائعة | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .faq-item{ cursor:pointer; }
+  .faq-a{ max-height:0; overflow:hidden; transition: max-height .3s ease; color:var(--text-dim); font-size:.92rem; }
+  .faq-item.open .faq-a{ max-height:300px; margin-top:12px; }
+  .faq-q{ display:flex; justify-content:space-between; align-items:center; font-weight:700; }
+</style>
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="مساعدة" data-en="Help">مساعدة</div>
+    <h1 data-ar="الأسئلة الشائعة" data-en="Frequently Asked Questions">الأسئلة الشائعة</h1>
+  </section>
+
+  <section class="section-tight">
+    <div class="container" style="max-width:720px;">
+      <div id="faqList"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script>
+  function render(){
+    const lang = IF.getLang();
+    document.getElementById('faqList').innerHTML = IF_DATA.faq.map((f,i) => `
+      <div class="card faq-item" style="margin-bottom:14px;" data-i="${i}">
+        <div class="faq-q"><span>${lang==='ar'?f.ar:f.en}</span><span>＋</span></div>
+        <div class="faq-a">${lang==='ar'?f.aAr:f.aEn}</div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.faq-item').forEach(it=>{
+      it.addEventListener('click', ()=> it.classList.toggle('open'));
+    });
+  }
+  render();
+  document.addEventListener('if:langchange', render);
+</script>
+</body>
+</html>

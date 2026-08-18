@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مكتبة التمارين | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .ex-card{ cursor:pointer; }
+  .ex-head{ display:flex; align-items:center; gap:14px; }
+  .ex-details{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
+  .ex-card.open .ex-details{ max-height:600px; margin-top:18px; }
+  .ex-details ol{ padding-inline-start:20px; margin:0 0 12px; color:var(--text-dim); font-size:.9rem; }
+  .ex-details ol li{ margin-bottom:6px; }
+  .ex-toggle-icon{ transition: transform .25s ease; flex-shrink:0; }
+  .ex-card.open .ex-toggle-icon{ transform: rotate(45deg); color: var(--accent) !important; }
+</style>
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="مكتبة التمارين" data-en="Exercise Library">مكتبة التمارين</div>
+    <h1 data-ar="اتعلّم الحركة الصحيحة لكل تمرين" data-en="Learn the right form for every move">اتعلّم الحركة الصحيحة لكل تمرين</h1>
+    <p data-ar="اضغط على أي تمرين عشان تشوف خطوات الأداء، الأخطاء الشائعة، وبدائل بدون جهاز." data-en="Tap any exercise to see step-by-step form, common mistakes, and no-equipment alternatives.">اضغط على أي تمرين عشان تشوف خطوات الأداء، الأخطاء الشائعة، وبدائل بدون جهاز.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="chip-group" id="muscleFilter" style="margin-bottom:14px;"></div>
+      <div class="chip-group" id="equipFilter" style="margin-bottom:32px;"></div>
+      <div class="grid grid-2" id="exGrid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/exercise-animations.js"></script>
+<script src="../js/exercise-media.js"></script>
+<script>
+  let mFilter = 'all', eFilter = 'all';
+  const equipList = [
+    {id:'all', ar:'الكل', en:'All'}, {id:'none', ar:'بدون جهاز', en:'No Equipment'},
+    {id:'barbell', ar:'بار', en:'Barbell'}, {id:'dumbbell', ar:'دمبل', en:'Dumbbell'},
+    {id:'machine', ar:'جهاز', en:'Machine'}, {id:'cable', ar:'كابل', en:'Cable'},
+  ];
+  const levelBadge = { easy:{ar:'سهل',en:'Easy',cls:'badge-success'}, medium:{ar:'متوسط',en:'Medium',cls:'badge-warning'}, hard:{ar:'صعب',en:'Hard',cls:'badge-danger'} };
+
+  function renderFilters(){
+    const lang = IF.getLang();
+    const muscles = [{id:'all', ar:'الكل', en:'All'}, ...IF_DATA.muscleGroups];
+    document.getElementById('muscleFilter').innerHTML = muscles.map(m=>`<button class="chip ${m.id===mFilter?'active':''}" data-m="${m.id}">${lang==='ar'?m.ar:m.en}</button>`).join('');
+    document.getElementById('equipFilter').innerHTML = equipList.map(m=>`<button class="chip ${m.id===eFilter?'active':''}" data-e="${m.id}">${lang==='ar'?m.ar:m.en}</button>`).join('');
+  }
+
+  function renderExercises(){
+    const lang = IF.getLang();
+    const list = IF_DATA.exercises.filter(x =>
+      (mFilter==='all' || x.muscle===mFilter) && (eFilter==='all' || x.equip===eFilter)
+    );
+    const grid = document.getElementById('exGrid');
+    if(!list.length){
+      grid.innerHTML = `<p class="text-dim">${lang==='ar'?'مفيش تمارين مطابقة للفلتر ده.':'No exercises match this filter.'}</p>`;
+      return;
+    }
+    grid.innerHTML = list.map(x => {
+      const lvl = levelBadge[x.level];
+      const pLabel = PATTERN_LABELS[x.pattern];
+      return `
+      <div class="card ex-card" data-id="${x.id}" data-reveal>
+        <div class="ex-media">
+          ${getExerciseMedia(x)}
+          <div class="ex-media-badge"><i></i>${lang==='ar'?'حركة توضيحية':'Motion Guide'}</div>
+        </div>
+        <div class="ex-card-body">
+          <div class="ex-head">
+            <div style="flex:1;">
+              <h3 style="font-size:1.12rem; margin-bottom:6px;">${lang==='ar'?x.ar:x.en}</h3>
+              <div class="flex gap-8" style="flex-wrap:wrap;">
+                <span class="badge ${lvl.cls}">${lang==='ar'?lvl.ar:lvl.en}</span>
+                <span class="badge">${lang==='ar'? (IF_DATA.muscleGroups.find(m=>m.id===x.muscle)?.ar) : (IF_DATA.muscleGroups.find(m=>m.id===x.muscle)?.en)}</span>
+              </div>
+            </div>
+            <span class="ex-toggle-icon" style="color:var(--text-faint); font-size:1.2rem;">＋</span>
+          </div>
+          <p style="margin:14px 0 0;">${lang==='ar'?x.descAr:x.descEn}</p>
+          <div class="ex-details">
+          <h4 style="font-size:.85rem; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px;">${lang==='ar'?'خطوات الأداء':'How to perform'}</h4>
+          <ol>${(lang==='ar'?x.stepsAr:x.stepsEn).map(s=>`<li>${s}</li>`).join('')}</ol>
+          <div class="alert alert-warning">${lang==='ar'?x.mistakesAr:x.mistakesEn}</div>
+          <div class="alert alert-info">${lang==='ar'?x.altAr:x.altEn}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.ex-card').forEach(card=>{
+      card.addEventListener('click', ()=> card.classList.toggle('open'));
+    });
+    IF.initReveal();
+  }
+
+  document.getElementById('muscleFilter').addEventListener('click', e=>{
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    mFilter = btn.getAttribute('data-m'); renderFilters(); renderExercises();
+  });
+  document.getElementById('equipFilter').addEventListener('click', e=>{
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    eFilter = btn.getAttribute('data-e'); renderFilters(); renderExercises();
+  });
+
+  renderFilters(); renderExercises();
+  document.addEventListener('if:langchange', ()=>{ renderFilters(); renderExercises(); });
+</script>
+</body>
+</html>

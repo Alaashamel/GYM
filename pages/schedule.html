@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الجدول الأسبوعي | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container" data-aos="fade-down">
+    <div class="eyebrow" style="justify-content:center;" data-ar="المواعيد" data-en="Schedule">المواعيد</div>
+    <h1 data-ar="الجدول الأسبوعي للحصص" data-en="Weekly Class Schedule">الجدول الأسبوعي للحصص</h1>
+    <p data-ar="اختار اليوم وشوف الحصص المتاحة والمدرب المسؤول عنها." data-en="Pick a day and see the available classes and trainer.">اختار اليوم وشوف الحصص المتاحة والمدرب المسؤول عنها.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="tabs" data-panels="dayPanels" id="dayTabs"></div>
+      <div id="dayPanels"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  function trainerName(id, lang){ const t = IF_DATA.trainers.find(x=>x.id===id); return t ? (lang==='ar'?t.ar:t.en) : ''; }
+  
+  function renderSchedule(){
+    const lang = IF.getLang();
+    const tabs = document.getElementById('dayTabs');
+    const panels = document.getElementById('dayPanels');
+    tabs.innerHTML = IF_DATA.schedule.map((d,i)=>`<button class="tab-btn ${i===0?'active':''}" data-tab="day${i}">${lang==='ar'?d.dayAr:d.dayEn}</button>`).join('');
+    panels.innerHTML = IF_DATA.schedule.map((d,i)=>`
+      <div class="tab-panel ${i===0?'active':''}" id="day${i}" data-aos="fade-in">
+        <table>
+          <thead><tr><th data-ar="الوقت" data-en="Time">${lang==='ar'?'الوقت':'Time'}</th><th data-ar="الحصة" data-en="Class">${lang==='ar'?'الحصة':'Class'}</th><th data-ar="المدرب" data-en="Trainer">${lang==='ar'?'المدرب':'Trainer'}</th></tr></thead>
+          <tbody>${d.items.map(it => `<tr><td dir="ltr" style="text-align:${lang==='ar'?'end':'start'}">${it.time}</td><td>${lang==='ar'?it.ar:it.en}</td><td>${trainerName(it.trainer, lang)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    `).join('');
+    wireTabs();
+  }
+  
+  function wireTabs(){
+    document.querySelectorAll('#dayTabs .tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#dayTabs .tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.getAttribute('data-tab');
+        document.querySelectorAll('#dayPanels .tab-panel').forEach(p=>p.classList.toggle('active', p.id===target));
+      });
+    });
+  }
+  
+  renderSchedule();
+  document.addEventListener('if:langchange', renderSchedule);
+</script>
+</body>
+</html>

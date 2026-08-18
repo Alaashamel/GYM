@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المدربين | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+  .trainer-card{ position:relative; overflow:hidden; text-align:center; }
+  .trainer-card::before{ content:""; position:absolute; inset:-45% -20% auto; height:220px; background:radial-gradient(circle, color-mix(in srgb, var(--accent) 16%, transparent), transparent 68%); pointer-events:none; }
+  .trainer-photo-btn{ width:126px; height:126px; padding:0; border:2px solid transparent; border-radius:50%; background:linear-gradient(var(--surface),var(--surface)) padding-box, var(--accent-grad) border-box; margin:0 auto 18px; position:relative; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,.35), 0 0 0 5px color-mix(in srgb, var(--accent) 7%, transparent); transition:transform .25s ease, box-shadow .25s ease; }
+  .trainer-photo-btn:hover{ transform:translateY(-4px) scale(1.03); box-shadow:0 18px 42px rgba(0,0,0,.45), 0 0 0 7px color-mix(in srgb, var(--accent) 10%, transparent); }
+  .trainer-photo-btn img{ width:100%; height:100%; object-fit:cover; object-position:center 30%; pointer-events:none; transition:transform .35s ease; }
+  .trainer-photo-btn:hover img{ transform:scale(1.06); }
+  .trainer-photo-btn::after{ content:'↗'; position:absolute; inset:auto 8px 8px auto; width:28px; height:28px; display:grid; place-items:center; border-radius:50%; background:rgba(18,19,22,.86); color:#fff; border:1px solid rgba(255,255,255,.18); font-size:16px; font-weight:800; box-shadow:0 5px 14px rgba(0,0,0,.3); }
+  .trainer-placeholder{ width:126px; height:126px; margin:0 auto 18px; }
+  .trainer-modal{ display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,.90); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:24px; opacity:0; transition:opacity .25s ease; }
+  .trainer-modal.active{ display:flex; opacity:1; }
+  .trainer-modal-content{ max-width:min(92vw,900px); max-height:88vh; width:auto; height:auto; object-fit:contain; border-radius:18px; box-shadow:0 24px 80px rgba(0,0,0,.75); border:1px solid rgba(255,255,255,.14); transform:scale(.96); transition:transform .3s cubic-bezier(.175,.885,.32,1.275); }
+  .trainer-modal.active .trainer-modal-content{ transform:scale(1); }
+  .trainer-modal-close{ position:absolute; top:18px; inset-inline-end:24px; width:46px; height:46px; border-radius:50%; border:1px solid rgba(255,255,255,.16); background:rgba(20,20,22,.78); color:#fff; font-size:30px; line-height:1; cursor:pointer; z-index:2; }
+  .trainer-modal-close:hover{ color:var(--accent); border-color:var(--accent); }
+  .trainer-modal-caption{ position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(18,19,22,.78); border:1px solid rgba(255,255,255,.12); color:#fff; padding:8px 16px; border-radius:999px; font-weight:700; backdrop-filter:blur(8px); white-space:nowrap; }
+  @media(max-width:640px){ .trainer-photo-btn,.trainer-placeholder{ width:112px;height:112px; } .trainer-modal{padding:14px;} .trainer-modal-content{max-width:96vw;max-height:84vh;border-radius:14px;} .trainer-modal-caption{bottom:12px;font-size:.85rem;} }
+</style>
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container" data-aos="fade-down">
+    <div class="eyebrow" style="justify-content:center;" data-ar="فريقنا" data-en="Our Team">فريقنا</div>
+    <h1 data-ar="مدربين محترفين معاك خطوة بخطوة" data-en="Pro trainers with you every step">مدربين محترفين معاك خطوة بخطوة</h1>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="chip-group" id="specFilter" style="margin-bottom:32px; justify-content:center; display:flex;"></div>
+      <div class="grid grid-3" id="trainersGrid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<div id="trainerImageModal" class="trainer-modal" aria-hidden="true" onclick="closeTrainerImage(event)">
+  <button class="trainer-modal-close" type="button" aria-label="Close" onclick="closeTrainerImage(event)">&times;</button>
+  <img id="trainerModalImg" class="trainer-modal-content" src="" alt="صورة المدرب مكبرة" onclick="event.stopPropagation()">
+  <div id="trainerModalCaption" class="trainer-modal-caption"></div>
+</div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  let activeSpec = 'all';
+
+  function renderFilter(){
+    const lang = IF.getLang();
+    const specs = ['all', ...new Set(IF_DATA.trainers.map(t=>lang==='ar'?t.specAr:t.specEn))];
+    document.getElementById('specFilter').innerHTML = specs.map(s => `
+      <button class="chip ${s===activeSpec?'active':''}" data-spec="${s}">${s==='all' ? (lang==='ar'?'الكل':'All') : s}</button>
+    `).join('');
+  }
+
+  function trainerInitials(name){
+    return name.split(' ').map(w=>w[0]).slice(0,2).join('');
+  }
+
+  function renderTrainers(){
+    const lang = IF.getLang();
+    const list = IF_DATA.trainers.filter(t => activeSpec==='all' || (lang==='ar'?t.specAr:t.specEn) === activeSpec);
+    document.getElementById('trainersGrid').innerHTML = list.map((t, i) => {
+      const name = lang==='ar'?t.ar:t.en;
+      const image = t.image ? `
+        <button class="trainer-photo-btn" type="button" aria-label="${lang==='ar'?'عرض صورة '+name:'View '+name+' photo'}" onclick="openTrainerImage('${t.fullImage || t.image}', '${name.replace(/'/g, "\\'")}')">
+          <img src="${t.image}" alt="${name}" loading="lazy">
+        </button>` : `<div class="avatar trainer-placeholder">${trainerInitials(name)}</div>`;
+      return `
+      <div class="card trainer-card" data-aos="fade-up" data-aos-delay="${i*80}">
+        ${image}
+        <h3 style="font-size:1.1rem;">${name}</h3>
+        <p style="color:var(--accent); font-weight:700; font-size:.9rem; margin-bottom:6px;">${lang==='ar'?t.specAr:t.specEn}</p>
+        <p style="font-size:.85rem;">${t.years} ${lang==='ar'?'سنوات خبرة':'years of experience'}</p>
+      </div>`;
+    }).join('');
+  }
+
+  function renderAll(){ renderFilter(); renderTrainers(); }
+
+  document.getElementById('specFilter').addEventListener('click', function(e){
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    activeSpec = btn.getAttribute('data-spec');
+    renderAll();
+    if(typeof AOS !== 'undefined') AOS.refresh();
+  });
+
+  function openTrainerImage(src, name){
+    const modal = document.getElementById('trainerImageModal');
+    const img = document.getElementById('trainerModalImg');
+    const caption = document.getElementById('trainerModalCaption');
+    img.src = src;
+    img.alt = name;
+    caption.textContent = name;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeTrainerImage(event){
+    if(event && event.target && event.target.id !== 'trainerImageModal' && !event.target.classList.contains('trainer-modal-close')) return;
+    const modal = document.getElementById('trainerImageModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeTrainerImage({target:document.getElementById('trainerImageModal')});
+  });
+
+  renderAll();
+  document.addEventListener('if:langchange', ()=>{ activeSpec='all'; renderAll(); });
+</script>
+</body>
+</html>

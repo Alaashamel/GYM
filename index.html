@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>آيرون فورج | مكانك الواحد لكل حاجة رياضية</title>
+  <meta name="description"
+    content="موقع جيم متكامل: تمارين، برامج تدريبية، حاسبات، محلل أكل بالصور، تتبع تقدم، وصفات وتحديات — كل حاجة في مكان واحد.">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <style>
+    /* تنسيق خاص لصورة البار الجديدة */
+    .barbell-3d-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      aspect-ratio: 1/1;
+    }
+
+    /* الظل البرتقالي الخلف البار (Glow) */
+    .barbell-3d-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%);
+      border-radius: 50%;
+      filter: blur(25px);
+      animation: pulseGlow 3s infinite alternate ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    .barbell-3d-wrapper svg {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 15px 30px rgba(255, 75, 31, 0.3));
+    }
+
+    @media (max-width: 640px) {
+      .barbell-3d-wrapper {
+        max-width: 260px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="navbar-root"></div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div data-aos="fade-left">
+          <div class="eyebrow" data-ar="جيمك المتكامل رقميًا" data-en="Your Digital Fitness Hub">جيمك المتكامل رقميًا
+          </div>
+          <h1 data-ar-html='كل حاجة محتاجها في &lt;span class="accent-text"&gt;مكان واحد&lt;/span&gt;'
+            data-en-html='Everything you need, &lt;span class="accent-text"&gt;one place&lt;/span&gt;'>
+            كل حاجة محتاجها في <span class="accent-text">مكان واحد</span>
+          </h1>
+          <p class="hero-lede"
+            data-ar="تمارين موثقة، برامج تدريبية جاهزة، حاسبات دقيقة، محلل أكل بالصور، تتبع تقدم، ووصفات صحية. كل ده من غير ما تفتح تطبيق تاني."
+            data-en="Documented exercises, ready training programs, precise calculators, a food-photo analyzer, progress tracking, and healthy recipes. All without opening another app.">
+            تمارين موثقة، برامج تدريبية جاهزة، حاسبات دقيقة، محلل أكل بالصور، تتبع تقدم، ووصفات صحية. كل ده من غير ما
+            تفتح تطبيق تاني.
+          </p>
+          <div class="hero-cta">
+            <a href="pages/plans.html" class="btn btn-primary" data-ar="اشترك الآن" data-en="Join Now">اشترك الآن</a>
+            <a href="pages/tools.html" class="btn btn-outline" data-ar="جرّب الحاسبات مجانًا"
+              data-en="Try the Free Tools">جرّب الحاسبات مجانًا</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-plate">
+              <div class="plate plate-sm"></div>
+              <div>
+                <div class="stat-num" data-count="1200" data-suffix="+">0</div>
+                <div class="stat-label" data-ar="عضو نشط" data-en="Active members">عضو نشط</div>
+              </div>
+            </div>
+            <div class="stat-plate">
+              <div class="plate plate-sm"></div>
+              <div>
+                <div class="stat-num" data-count="18" data-suffix="+">0</div>
+                <div class="stat-label" data-ar="مدرب محترف" data-en="Pro trainers">مدرب محترف</div>
+              </div>
+            </div>
+            <div class="stat-plate">
+              <div class="plate plate-sm"></div>
+              <div>
+                <div class="stat-num" data-count="40" data-suffix="+">0</div>
+                <div class="stat-label" data-ar="تمرين موثّق" data-en="Documented exercises">تمرين موثّق</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- صورة البار 3D المعدلة (بإطار أبيض للصورة) -->
+        <div class="hero-visual" data-aos="zoom-in" data-aos-duration="1400">
+          <div class="barbell-3d-wrapper">
+            <svg viewBox="0 0 280 280">
+              <defs>
+                <linearGradient id="barGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FF4B1F" />
+                  <stop offset="100%" stop-color="#FFD000" />
+                </linearGradient>
+                <linearGradient id="shaftGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#2A2E36" />
+                  <stop offset="50%" stop-color="#4B515D" />
+                  <stop offset="100%" stop-color="#2A2E36" />
+                </linearGradient>
+                <filter id="neonGlow">
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+
+                <clipPath id="circleClip">
+                  <circle cx="140" cy="140" r="13" />
+                </clipPath>
+              </defs>
+
+              <!-- Background Glow Circles -->
+              <circle cx="140" cy="140" r="120" fill="none" stroke="#2C313A" stroke-width="1.5" opacity="0.6" />
+              <circle cx="140" cy="140" r="80" fill="none" stroke="#2C313A" stroke-width="1.5" opacity="0.4" />
+
+              <!-- Barbell Body -->
+              <g transform="translate(140,140)">
+                <!-- Bar Shaft -->
+                <rect x="-120" y="-7" width="240" height="14" rx="4" fill="url(#shaftGrad)" stroke="#1A1D22"
+                  stroke-width="2" />
+
+                <!-- Left Weights -->
+                <g filter="url(#neonGlow)">
+                  <rect x="-118" y="-42" width="24" height="84" rx="8" fill="url(#barGrad)" />
+                  <rect x="-90" y="-32" width="18" height="64" rx="6" fill="url(#barGrad)" opacity="0.85" />
+                </g>
+
+                <!-- Right Weights -->
+                <g filter="url(#neonGlow)">
+                  <rect x="94" y="-42" width="24" height="84" rx="8" fill="url(#barGrad)" />
+                  <rect x="72" y="-32" width="18" height="64" rx="6" fill="url(#barGrad)" opacity="0.85" />
+                </g>
+
+                <!-- Center Plate (The Core) -->
+                <!-- الإطار الأبيض اللامع -->
+                <circle cx="0" cy="0" r="16" fill="none" stroke="#FFFFFF" stroke-width="3" filter="url(#neonGlow)" />
+
+                <!-- 
+                 حاولنا تحميل الصورة بـ 3 مسارات مختلفة عشان تضمن ظهورها
+                 لو الصورة مش موجودة في أي مسار، هتظهر دايرة برتقالية في الخلفية
+              -->
+                <!-- 1. حاول من مجلد images (المسار الأقصر) -->
+                <image href="images/abdelrahman.jpg" x="-13" y="-13" width="26" height="26"
+                  clip-path="url(#circleClip)" />
+
+                <!-- 2. لو الأولى ماشتغلتش، جرب بالمسار المطلق للسيرفر -->
+                <image href="/images/abdelrahman.jpg" x="-13" y="-13" width="26" height="26"
+                  clip-path="url(#circleClip)" />
+
+                <!-- 3. لو الاتنين مش شغالين، جرب بالمسار النسبي للصفحة (لو الـ index جوه مجلد تاني) -->
+                <image href="../images/abdelrahman.jpg" x="-13" y="-13" width="26" height="26"
+                  clip-path="url(#circleClip)" />
+
+                <!-- خلفية برتقالية احتياطية تظهر تحت الصورة لو مفيش صورة -->
+                <circle cx="0" cy="0" r="13" fill="url(#barGrad)" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-head text-center" style="margin-inline:auto;" data-aos="fade-down">
+          <div class="eyebrow" style="justify-content:center;" data-ar="مميزات الموقع" data-en="Platform Features">
+            مميزات الموقع</div>
+          <h2 data-ar="مفيش حاجة ناقصة" data-en="Nothing left out">مفيش حاجة ناقصة</h2>
+          <p data-ar="من أول ما تدخل الجيم لحد ما توصل لهدفك، كل أداة محتاجها موجودة هنا."
+            data-en="From the first day at the gym to hitting your goal — every tool you need is right here.">من أول ما
+            تدخل الجيم لحد ما توصل لهدفك، كل أداة محتاجها موجودة هنا.</p>
+        </div>
+
+        <div class="grid grid-4">
+          <a class="card" href="pages/exercises.html" data-aos="fade-up" data-aos-delay="50">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="مكتبة التمارين" data-en="Exercise Library">مكتبة التمارين</h3>
+            <p data-ar="طريقة الأداء الصحيحة، الأخطاء الشائعة، وبدائل بدون جهاز لكل عضلة."
+              data-en="Proper form, common mistakes, and no-equipment alternatives for every muscle group.">طريقة الأداء
+              الصحيحة، الأخطاء الشائعة، وبدائل بدون جهاز لكل عضلة.</p>
+          </a>
+          <a class="card" href="pages/programs.html" data-aos="fade-up" data-aos-delay="100">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="أنظمة تدريبية" data-en="Training Programs">أنظمة تدريبية</h3>
+            <p data-ar="برامج جاهزة حسب مستواك وهدفك، أو ابنِ برنامجك الخاص في ثواني."
+              data-en="Ready programs based on your level and goal, or build your own in seconds.">برامج جاهزة حسب
+              مستواك وهدفك، أو ابنِ برنامجك الخاص في ثواني.</p>
+          </a>
+          <a class="card" href="pages/tools.html" data-aos="fade-up" data-aos-delay="150">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="الحاسبات" data-en="Calculators">الحاسبات</h3>
+            <p data-ar="BMI، السعرات اليومية، الوزن المثالي، 1RM، والسعرات المحروقة."
+              data-en="BMI, daily calories, ideal weight, 1RM, and calories burned.">BMI، السعرات اليومية، الوزن
+              المثالي، 1RM، والسعرات المحروقة.</p>
+          </a>
+          <a class="card" href="pages/food-analyzer.html" data-aos="fade-up" data-aos-delay="200">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="محلل الأكل بالصورة" data-en="Food Photo Analyzer">محلل الأكل بالصورة
+            </h3>
+            <p data-ar="ارفع صورة أكلك واعرف السعرات والمكونات وأي تنبيهات مهمة."
+              data-en="Upload a photo of your meal and get calories, ingredients, and key warnings.">ارفع صورة أكلك
+              واعرف السعرات والمكونات وأي تنبيهات مهمة.</p>
+          </a>
+          <a class="card" href="pages/progress.html" data-aos="fade-up" data-aos-delay="250">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="تتبع التقدم" data-en="Progress Tracking">تتبع التقدم</h3>
+            <p data-ar="سجّل وزنك وقياساتك وشوف تطورك على رسم بياني واضح."
+              data-en="Log your weight and measurements and watch your progress on a clear chart.">سجّل وزنك وقياساتك
+              وشوف تطورك على رسم بياني واضح.</p>
+          </a>
+          <a class="card" href="pages/recipes.html" data-aos="fade-up" data-aos-delay="300">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="وصفات صحية" data-en="Healthy Recipes">وصفات صحية</h3>
+            <p data-ar="وجبات بسيطة وسعراتها ومكوناتها، مناسبة لهدفك."
+              data-en="Simple meals with calories and ingredients, matched to your goal.">وجبات بسيطة وسعراتها
+              ومكوناتها، مناسبة لهدفك.</p>
+          </a>
+          <a class="card" href="pages/challenges.html" data-aos="fade-up" data-aos-delay="350">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="تحديات وإنجازات" data-en="Challenges & Badges">تحديات وإنجازات</h3>
+            <p data-ar="انضم لتحدي، سجّل حضورك اليومي، وحافظ على الاستمرارية."
+              data-en="Join a challenge, check in daily, and stay consistent.">انضم لتحدي، سجّل حضورك اليومي، وحافظ على
+              الاستمرارية.</p>
+          </a>
+          <a class="card" href="pages/trainers.html" data-aos="fade-up" data-aos-delay="400">
+            <div class="plate plate-sm" style="margin-bottom:16px;"></div>
+            <h3 style="font-size:1.05rem;" data-ar="مدربين محترفين" data-en="Pro Trainers">مدربين محترفين</h3>
+            <p data-ar="فريق متخصص في الأثقال، الكارديو، اليوجا، والتغذية الرياضية."
+              data-en="A team specialized in weights, cardio, yoga, and sports nutrition.">فريق متخصص في الأثقال،
+              الكارديو، اليوجا، والتغذية الرياضية.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANS PREVIEW -->
+    <section class="section slab">
+      <div class="container">
+        <div class="section-head text-center" style="margin-inline:auto;" data-aos="fade-down">
+          <div class="eyebrow" style="justify-content:center;" data-ar="الاشتراكات" data-en="Membership">الاشتراكات
+          </div>
+          <h2 data-ar="اختار الخطة المناسبة لك" data-en="Choose the plan that fits you">اختار الخطة المناسبة لك</h2>
+        </div>
+        <div class="grid grid-3" id="planPreviewGrid" data-aos="fade-up"></div>
+        <div class="text-center" style="margin-top:34px;">
+          <a href="pages/plans.html" class="btn btn-outline" data-ar="شوف كل التفاصيل" data-en="See full details">شوف كل
+            التفاصيل</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head text-center" style="margin-inline:auto;" data-aos="fade-down">
+          <div class="eyebrow" style="justify-content:center;" data-ar="آراء الأعضاء" data-en="Member Stories">آراء
+            الأعضاء</div>
+          <h2 data-ar="قالوا إيه عن آيرون فورج" data-en="What they say about Iron Forge">قالوا إيه عن آيرون فورج</h2>
+        </div>
+        <div class="grid grid-3">
+          <div class="card" data-aos="fade-up" data-aos-delay="0">
+            <div style="font-size: 2.5rem; color: var(--accent); line-height: 0.8; margin-bottom: 8px;">“</div>
+            <p style="color:var(--text); font-size:1.05rem; font-style: italic; line-height: 1.6;"
+              data-ar="نزلت 12 كيلو في 4 شهور باستخدام حاسبة السعرات وخطة الأكل. حاجة تانية خالص."
+              data-en="I lost 12kg in 4 months using the calorie calculator and meal plan. Total game changer.">
+              "نزلت 12 كيلو في 4 شهور باستخدام حاسبة السعرات وخطة الأكل. حاجة تانية خالص."
+            </p>
+            <div
+              style="display: flex; align-items: center; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+              <div class="avatar" style="width: 40px; height: 40px; font-size: 1rem; background: var(--accent-grad);">م
+              </div>
+              <div style="font-weight:700; color:var(--text);">— مصطفى ه.</div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="100">
+            <div style="font-size: 2.5rem; color: var(--accent); line-height: 0.8; margin-bottom: 8px;">“</div>
+            <p style="color:var(--text); font-size:1.05rem; font-style: italic; line-height: 1.6;"
+              data-ar="مكتبة التمارين وضحتلي غلطات كنت بعملها من سنين في السكوات والديدليفت."
+              data-en="The exercise library fixed form mistakes I'd been making for years on squats and deadlifts.">
+              "مكتبة التمارين وضحتلي غلطات كنت بعملها من سنين في السكوات والديدليفت."
+            </p>
+            <div
+              style="display: flex; align-items: center; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+              <div class="avatar" style="width: 40px; height: 40px; font-size: 1rem; background: var(--accent-grad);">د
+              </div>
+              <div style="font-weight:700; color:var(--text);">— دينا أ.</div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <div style="font-size: 2.5rem; color: var(--accent); line-height: 0.8; margin-bottom: 8px;">“</div>
+            <p style="color:var(--text); font-size:1.05rem; font-style: italic; line-height: 1.6;"
+              data-ar="محلل الأكل بالصورة سهّل عليا كتير، مبقتش محتاجة أحسب يدوي كل وجبة."
+              data-en="The food photo analyzer made things so much easier — no more manual calorie counting.">
+              "محلل الأكل بالصورة سهّل عليا كتير، مبقتش محتاجة أحسب يدوي كل وجبة."
+            </p>
+            <div
+              style="display: flex; align-items: center; gap: 12px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+              <div class="avatar" style="width: 40px; height: 40px; font-size: 1rem; background: var(--accent-grad);">ن
+              </div>
+              <div style="font-weight:700; color:var(--text);">— نور س.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="section-tight">
+      <div class="container" data-aos="zoom-in">
+        <div class="card text-center" style="padding:54px 30px; background: var(--accent-grad); border:none;">
+          <h2 style="color:#fff; font-size: clamp(1.8rem, 3vw, 2.5rem);" data-ar="جاهز تبدأ رحلتك؟"
+            data-en="Ready to start your journey?">جاهز تبدأ رحلتك؟</h2>
+          <p style="color:rgba(255,255,255,.9); max-width:520px; margin-inline:auto;"
+            data-ar="سجّل حساب مجاني دلوقتي واستخدم كل الأدوات من غير أي التزام."
+            data-en="Create a free account now and use every tool with zero commitment.">سجّل حساب مجاني دلوقتي واستخدم
+            كل الأدوات من غير أي التزام.</p>
+          <a href="pages/login.html" class="btn"
+            style="background:#fff; color:var(--accent); margin-top:14px; font-weight:800;" data-ar="أنشئ حسابك المجاني"
+            data-en="Create your free account">أنشئ حسابك المجاني</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/data.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    function renderPlanPreview() {
+      const lang = IF.getLang();
+      const grid = document.getElementById('planPreviewGrid');
+      grid.innerHTML = IF_DATA.plans.map(p => `
+      <div class="card" style="${p.popular ? 'border-color:var(--accent); position:relative;' : ''}">
+        ${p.popular ? `<span class="badge badge-accent" style="position:absolute; top:-12px; inset-inline-start:24px;">${lang === 'ar' ? 'الأكثر طلبًا' : 'Most Popular'}</span>` : ''}
+        <h3 style="font-size:1.2rem;">${lang === 'ar' ? p.ar : p.en}</h3>
+        <div style="font-family:var(--font-display); font-size:2rem; font-weight:800; margin:8px 0;">${p.monthly} <span style="font-size:.9rem; color:var(--text-dim); font-family:var(--font-body);">${lang === 'ar' ? 'جنيه/شهر' : 'EGP/mo'}</span></div>
+        <ul style="margin:16px 0;">
+          ${(lang === 'ar' ? p.featAr : p.featEn).slice(0, 3).map(f => `<li style="color:var(--text-dim); font-size:.9rem; margin-bottom:8px; display:flex; gap:8px;"><span style="color:var(--accent);">✓</span>${f}</li>`).join('')}
+        </ul>
+      </div>`).join('');
+    }
+    renderPlanPreview();
+    document.addEventListener('if:langchange', renderPlanPreview);
+  </script>
+</body>
+
+</html>

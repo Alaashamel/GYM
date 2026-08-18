@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الاشتراكات | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="الاشتراكات" data-en="Membership">الاشتراكات</div>
+    <h1 data-ar="خطة لكل هدف وميزانية" data-en="A plan for every goal and budget">خطة لكل هدف وميزانية</h1>
+    <p data-ar="من غير عقود طويلة ومن غير رسوم مخفية. اختار اللي يناسبك وابدأ فورًا." data-en="No long contracts, no hidden fees. Pick what suits you and start right away.">من غير عقود طويلة ومن غير رسوم مخفية. اختار اللي يناسبك وابدأ فورًا.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="flex items-center" style="justify-content:center; gap:12px; margin-bottom:36px;">
+        <div class="chip-group" id="billingToggle">
+          <button class="chip active" data-cycle="monthly" data-ar="شهري" data-en="Monthly">شهري</button>
+          <button class="chip" data-cycle="yearly" data-ar="سنوي (وفّر شهرين)" data-en="Yearly (save 2 mo)">سنوي (وفّر شهرين)</button>
+        </div>
+      </div>
+      <div class="grid grid-3" id="plansGrid"></div>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="card text-center" style="padding:40px;">
+        <h3 data-ar="مش متأكد أي خطة تناسبك؟" data-en="Not sure which plan fits?">مش متأكد أي خطة تناسبك؟</h3>
+        <p data-ar="تواصل مع فريقنا وهنساعدك تختار صح على حسب هدفك." data-en="Talk to our team and we'll help you choose based on your goal.">تواصل مع فريقنا وهنساعدك تختار صح على حسب هدفك.</p>
+        <a href="contact.html" class="btn btn-primary" data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script>
+  let cycle = 'monthly';
+  function renderPlans(){
+    const lang = IF.getLang();
+    const grid = document.getElementById('plansGrid');
+    grid.innerHTML = IF_DATA.plans.map(p => {
+      const price = cycle === 'monthly' ? p.monthly : p.yearly;
+      const period = cycle === 'monthly' ? (lang==='ar'?'جنيه/شهر':'EGP/mo') : (lang==='ar'?'جنيه/سنة':'EGP/yr');
+      return `
+      <div class="card" style="${p.popular ? 'border-color:var(--accent); position:relative;' : ''}">
+        ${p.popular ? `<span class="badge badge-accent" style="position:absolute; top:-12px; inset-inline-start:24px;">${lang==='ar'?'الأكثر طلبًا':'Most Popular'}</span>` : ''}
+        <h3 style="font-size:1.3rem; margin-top:8px;">${lang==='ar'?p.ar:p.en}</h3>
+        <div style="font-family:var(--font-display); font-size:2.4rem; font-weight:800; margin:10px 0;">${price} <span style="font-size:.85rem; color:var(--text-dim); font-family:var(--font-body);">${period}</span></div>
+        <ul style="margin:20px 0;">
+          ${(lang==='ar'?p.featAr:p.featEn).map(f=>`<li style="color:var(--text-dim); font-size:.92rem; margin-bottom:10px; display:flex; gap:8px; align-items:flex-start;"><span style="color:var(--accent); flex-shrink:0;">✓</span>${f}</li>`).join('')}
+        </ul>
+        <a href="login.html" class="btn ${p.popular?'btn-primary':'btn-outline'} btn-block">${lang==='ar'?'اشترك الآن':'Subscribe Now'}</a>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('billingToggle').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    document.querySelectorAll('#billingToggle .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    cycle = btn.getAttribute('data-cycle');
+    renderPlans();
+  });
+  renderPlans();
+  document.addEventListener('if:langchange', renderPlans);
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="section" style="padding-top:50px;">
+    <div class="container" style="max-width:460px;">
+      <div class="card">
+        <div class="tabs" data-panels="authPanels" id="authTabs" style="margin-bottom:0;">
+          <button class="tab-btn active" data-tab="loginPanel" data-ar="تسجيل الدخول" data-en="Login">تسجيل الدخول</button>
+          <button class="tab-btn" data-tab="registerPanel" data-ar="حساب جديد" data-en="Register">حساب جديد</button>
+        </div>
+        <div id="authPanels">
+          <div class="tab-panel active" id="loginPanel">
+            <div id="loginError" class="alert alert-danger hidden" data-ar="البريد أو كلمة المرور غلط." data-en="Incorrect email or password.">البريد أو كلمة المرور غلط.</div>
+            <form id="loginForm">
+              <div class="field"><label data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label><input type="email" id="lEmail" required></div>
+              <div class="field"><label data-ar="كلمة المرور" data-en="Password">كلمة المرور</label><input type="password" id="lPass" required></div>
+              <button class="btn btn-primary btn-block" type="submit" data-ar="دخول" data-en="Login">دخول</button>
+            </form>
+          </div>
+          <div class="tab-panel" id="registerPanel">
+            <div id="regError" class="alert alert-danger hidden" data-ar="البريد ده مسجل قبل كده." data-en="This email is already registered.">البريد ده مسجل قبل كده.</div>
+            <form id="registerForm">
+              <div class="field"><label data-ar="الاسم بالكامل" data-en="Full name">الاسم بالكامل</label><input type="text" id="rName" required></div>
+              <div class="field"><label data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label><input type="email" id="rEmail" required></div>
+              <div class="field"><label data-ar="كلمة المرور" data-en="Password">كلمة المرور</label><input type="password" id="rPass" required></div>
+              <div class="field">
+                <label data-ar="هدفك الرئيسي" data-en="Main goal">هدفك الرئيسي</label>
+                <select id="rGoal">
+                  <option value="general" data-ar="لياقة عامة" data-en="General fitness">لياقة عامة</option>
+                  <option value="strength" data-ar="قوة" data-en="Strength">قوة</option>
+                  <option value="hypertrophy" data-ar="تضخيم" data-en="Hypertrophy">تضخيم</option>
+                  <option value="fatloss" data-ar="حرق دهون" data-en="Fat loss">حرق دهون</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-block" type="submit" data-ar="إنشاء الحساب" data-en="Create Account">إنشاء الحساب</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <p class="text-dim text-center" style="margin-top:16px; font-size:.82rem;" data-ar="ملاحظة: ده نظام دخول وهمي لأغراض العرض، بياناتك بتتحفظ في متصفحك فقط." data-en="Note: this is a demo login system — your data is stored only in your browser.">ملاحظة: ده نظام دخول وهمي لأغراض العرض، بياناتك بتتحفظ في متصفحك فقط.</p>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  // if already logged in, go straight to profile
+  if(getCurrentUser()) window.location.href = 'profile.html';
+
+  document.getElementById('loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('lEmail').value.trim();
+    const pass = document.getElementById('lPass').value;
+    const res = loginUser(email, pass);
+    if(res.ok) window.location.href = 'profile.html';
+    else document.getElementById('loginError').classList.remove('hidden');
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('rName').value.trim();
+    const email = document.getElementById('rEmail').value.trim();
+    const pass = document.getElementById('rPass').value;
+    const goal = document.getElementById('rGoal').value;
+    const res = registerUser({ name, email, password: pass, goal });
+    if(res.ok) window.location.href = 'profile.html';
+    else document.getElementById('regError').classList.remove('hidden');
+  });
+</script>
+</body>
+</html>

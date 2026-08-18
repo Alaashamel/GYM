@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تواصل معنا | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="تواصل معنا" data-en="Contact Us">تواصل معنا</div>
+    <h1 data-ar="عندك سؤال؟ احنا هنا" data-en="Have a question? We're here">عندك سؤال؟ احنا هنا</h1>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <div id="successMsg" class="alert alert-success hidden" data-ar="تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت." data-en="Your message was sent! We'll get back to you soon.">تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت.</div>
+          <form id="contactForm">
+            <div class="field"><label data-ar="الاسم" data-en="Name">الاسم</label><input type="text" id="cName" required></div>
+            <div class="field"><label data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label><input type="email" id="cEmail" required></div>
+            <div class="field"><label data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label><input type="tel" id="cPhone"></div>
+            <div class="field"><label data-ar="رسالتك" data-en="Message">رسالتك</label><textarea id="cMessage" rows="5" required></textarea></div>
+            <div id="formError" class="alert alert-danger hidden" data-ar="من فضلك املأ الاسم والإيميل والرسالة بشكل صحيح." data-en="Please fill in a valid name, email, and message.">من فضلك املأ الاسم والإيميل والرسالة بشكل صحيح.</div>
+            <button type="submit" class="btn btn-primary btn-block" data-ar="إرسال الرسالة" data-en="Send Message">إرسال الرسالة</button>
+          </form>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <h3 style="font-size:1rem;" data-ar="بيانات التواصل" data-en="Contact Info">بيانات التواصل</h3>
+            <p style="margin-bottom:6px;" data-ar="📍 شارع الرياضة، الجيزة، مصر" data-en="📍 Sports St., Giza, Egypt">📍 شارع الرياضة، الجيزة، مصر</p>
+            <p style="margin-bottom:6px;" dir="ltr" class="text-dim">📞 01000000000</p>
+            <p style="margin-bottom:6px;" dir="ltr" class="text-dim">✉️ info@ironforge-gym.com</p>
+            <p data-ar="🕐 يوميًا من 7 صباحًا حتى 12 منتصف الليل" data-en="🕐 Daily, 7 AM – Midnight">🕐 يوميًا من 7 صباحًا حتى 12 منتصف الليل</p>
+          </div>
+          <div class="card" style="padding:0; overflow:hidden;">
+            <iframe title="map" src="https://www.google.com/maps?q=Giza,Egypt&output=embed" width="100%" height="280" style="border:0; display:block;" loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script>
+  document.getElementById('contactForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('cName').value.trim();
+    const email = document.getElementById('cEmail').value.trim();
+    const msg = document.getElementById('cMessage').value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const errBox = document.getElementById('formError');
+    const okBox = document.getElementById('successMsg');
+    if(!name || !emailOk || !msg){
+      errBox.classList.remove('hidden'); okBox.classList.add('hidden');
+      return;
+    }
+    errBox.classList.add('hidden');
+    okBox.classList.remove('hidden');
+    document.getElementById('contactForm').reset();
+  });
+</script>
+</body>
+</html>

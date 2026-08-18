@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تتبع التقدم | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="تتبع التقدم" data-en="Progress Tracking">تتبع التقدم</div>
+    <h1 data-ar="شوف تطورك بعينك" data-en="Watch your progress unfold">شوف تطورك بعينك</h1>
+    <p data-ar="بياناتك بتتحفظ في متصفحك فقط (localStorage)، محدش تاني بيشوفها." data-en="Your data is stored only in your browser (localStorage) — no one else can see it.">بياناتك بتتحفظ في متصفحك فقط (localStorage)، محدش تاني بيشوفها.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:start;">
+        <div class="card">
+          <h3 style="font-size:1rem;" data-ar="سجّل قياس جديد" data-en="Log a new entry">سجّل قياس جديد</h3>
+          <div class="field"><label data-ar="التاريخ" data-en="Date">التاريخ</label><input type="date" id="pDate"></div>
+          <div class="field-row">
+            <div class="field"><label data-ar="الوزن (كجم)" data-en="Weight (kg)">الوزن (كجم)</label><input type="number" id="pWeight" step="0.1"></div>
+            <div class="field"><label data-ar="محيط الخصر (سم) - اختياري" data-en="Waist (cm) - optional">محيط الخصر (سم) - اختياري</label><input type="number" id="pWaist"></div>
+          </div>
+          <button class="btn btn-primary btn-block" id="addEntryBtn" data-ar="حفظ القياس" data-en="Save Entry">حفظ القياس</button>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:1rem;" data-ar="منحنى الوزن" data-en="Weight Trend">منحنى الوزن</h3>
+          <canvas id="progressChart" height="220"></canvas>
+          <p id="noDataMsg" class="text-dim" style="text-align:center; margin-top:16px;" data-ar="مفيش بيانات لسه، سجّل أول قياس." data-en="No data yet — log your first entry.">مفيش بيانات لسه، سجّل أول قياس.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;">
+        <h3 style="font-size:1rem;" data-ar="كل القياسات" data-en="All Entries">كل القياسات</h3>
+        <div style="overflow-x:auto;">
+          <table id="entriesTable">
+            <thead><tr>
+              <th data-ar="التاريخ" data-en="Date">التاريخ</th>
+              <th data-ar="الوزن" data-en="Weight">الوزن</th>
+              <th data-ar="الخصر" data-en="Waist">الخصر</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="entriesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+  document.getElementById('pDate').value = new Date().toISOString().slice(0,10);
+
+  function renderAll(){
+    const lang = IF.getLang();
+    const entries = getProgressEntries();
+    const canvas = document.getElementById('progressChart');
+    const noData = document.getElementById('noDataMsg');
+    if(entries.length){
+      canvas.style.display = 'block'; noData.style.display='none';
+      renderProgressChart(canvas, entries, lang);
+    } else {
+      canvas.style.display = 'none'; noData.style.display='block';
+    }
+    const body = document.getElementById('entriesBody');
+    body.innerHTML = [...entries].reverse().map(e => `
+      <tr>
+        <td>${e.date}</td>
+        <td>${e.weight} ${lang==='ar'?'كجم':'kg'}</td>
+        <td>${e.waist ? e.waist + (lang==='ar'?' سم':' cm') : '—'}</td>
+        <td><button class="btn btn-sm btn-outline" data-del="${e.id}">${lang==='ar'?'حذف':'Delete'}</button></td>
+      </tr>
+    `).join('') || `<tr><td colspan="4" class="text-dim">${lang==='ar'?'مفيش قياسات مسجلة.':'No entries logged.'}</td></tr>`;
+
+    body.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ deleteProgressEntry(parseInt(btn.getAttribute('data-del'),10)); renderAll(); });
+    });
+  }
+
+  document.getElementById('addEntryBtn').addEventListener('click', ()=>{
+    const date = document.getElementById('pDate').value;
+    const weight = parseFloat(document.getElementById('pWeight').value);
+    const waist = parseFloat(document.getElementById('pWaist').value) || null;
+    if(!date || !weight) return;
+    saveProgressEntry({ date, weight, waist });
+    document.getElementById('pWeight').value = '';
+    document.getElementById('pWaist').value = '';
+    renderAll();
+  });
+
+  renderAll();
+  document.addEventListener('if:langchange', renderAll);
+</script>
+</body>
+</html>

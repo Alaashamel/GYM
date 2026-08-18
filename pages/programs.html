@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأنظمة التدريبية | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container" data-aos="fade-down">
+    <div class="eyebrow" style="justify-content:center;" data-ar="الأنظمة التدريبية" data-en="Training Programs">الأنظمة التدريبية</div>
+    <h1 data-ar="برنامج جاهز أو مصمم خصيصًا لك" data-en="A ready program or one built just for you">برنامج جاهز أو مصمم خصيصًا لك</h1>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="tabs" data-panels="progPanels" id="progTabs">
+        <button class="tab-btn active" data-tab="readyPanel" data-ar="برامج جاهزة" data-en="Ready Programs">برامج جاهزة</button>
+        <button class="tab-btn" data-tab="builderPanel" data-ar="اعمل برنامجك الخاص" data-en="Build Your Own">اعمل برنامجك الخاص</button>
+      </div>
+      <div id="progPanels">
+        <div class="tab-panel active" id="readyPanel">
+          <div class="chip-group" id="progFilter" style="margin-bottom:28px;"></div>
+          <div class="grid grid-2" id="progGrid"></div>
+        </div>
+
+        <div class="tab-panel" id="builderPanel">
+          <div class="card" style="max-width:640px; margin-bottom:30px;">
+            <div class="field"><label data-ar="هدفك" data-en="Your goal">هدفك</label><select id="bGoal"><option value="general" data-ar="لياقة عامة" data-en="General fitness">لياقة عامة</option><option value="strength" data-ar="قوة" data-en="Strength">قوة</option><option value="hypertrophy" data-ar="تضخيم عضلي" data-en="Hypertrophy">تضخيم عضلي</option><option value="fatloss" data-ar="حرق دهون" data-en="Fat loss">حرق دهون</option></select></div>
+            <div class="field-row"><div class="field"><label data-ar="مستواك" data-en="Your level">مستواك</label><select id="bLevel"><option value="beginner" data-ar="مبتدئ" data-en="Beginner">مبتدئ</option><option value="medium" data-ar="متوسط" data-en="Intermediate">متوسط</option><option value="hard" data-ar="محترف" data-en="Advanced">محترف</option></select></div><div class="field"><label data-ar="عدد أيام التمرين" data-en="Training days">عدد أيام التمرين</label><select id="bDays"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div></div>
+            <div class="field"><label data-ar="مكان التمرين" data-en="Where you train">مكان التمرين</label><select id="bPlace"><option value="gym" data-ar="جيم (كل الأجهزة متاحة)" data-en="Gym (full equipment)">جيم (كل الأجهزة متاحة)</option><option value="home" data-ar="منزل (بدون جهاز)" data-en="Home (no equipment)">منزل (بدون جهاز)</option></select></div>
+            <button class="btn btn-primary btn-block" id="genBtn" data-ar="ولّد برنامجي" data-en="Generate My Program">ولّد برنامجي</button>
+          </div>
+          <div id="builderResult"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  let progFilterVal = 'all';
+  const goalLabels = { general:{ar:'لياقة عامة',en:'General'}, strength:{ar:'قوة',en:'Strength'}, hypertrophy:{ar:'تضخيم',en:'Hypertrophy'}, fatloss:{ar:'حرق دهون',en:'Fat loss'} };
+  const levelLabels = { beginner:{ar:'مبتدئ',en:'Beginner'}, intermediate:{ar:'متوسط',en:'Intermediate'}, advanced:{ar:'محترف',en:'Advanced'} };
+
+  function exName(id, lang){ const e = IF_DATA.exercises.find(x=>x.id===id); return e ? (lang==='ar'?e.ar:e.en) : id; }
+
+  function renderProgFilter(){
+    const lang = IF.getLang();
+    const goals = ['all', ...Object.keys(goalLabels)];
+    document.getElementById('progFilter').innerHTML = goals.map(g => `
+      <button class="chip ${g===progFilterVal?'active':''}" data-g="${g}">${g==='all' ? (lang==='ar'?'كل الأهداف':'All Goals') : (lang==='ar'?goalLabels[g].ar:goalLabels[g].en)}</button>
+    `).join('');
+  }
+
+  function renderPrograms(){
+    const lang = IF.getLang();
+    const list = IF_DATA.programs.filter(p => progFilterVal==='all' || p.goal===progFilterVal);
+    document.getElementById('progGrid').innerHTML = list.map((p, i) => `
+      <div class="card" data-aos="fade-up" data-aos-delay="${i*50}">
+        <div class="flex justify-between items-center" style="margin-bottom:10px;">
+          <span class="badge badge-accent">${p.days} ${lang==='ar'?'أيام/أسبوع':'days/week'}</span>
+          <span class="badge">${lang==='ar'?levelLabels[p.level==='beginner'?'beginner':p.level==='advanced'?'advanced':'intermediate'].ar:levelLabels[p.level==='beginner'?'beginner':p.level==='advanced'?'advanced':'intermediate'].en}</span>
+        </div>
+        <h3 style="font-size:1.15rem;">${lang==='ar'?p.ar:p.en}</h3>
+        <p>${lang==='ar'?p.descAr:p.descEn}</p>
+        <div class="flex" style="flex-wrap:wrap; gap:8px; margin-top:12px;">
+          ${p.split.map(id=>`<span class="badge">${exName(id, lang)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('progFilter').addEventListener('click', function(e) {
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    progFilterVal = btn.getAttribute('data-g'); 
+    renderProgFilter(); 
+    renderPrograms();
+    if(typeof AOS !== 'undefined') AOS.refresh();
+  });
+
+  const DAY_SPLITS = { 2: [['chest','back'], ['legs','core']], 3: [['chest','shoulders','arms'], ['back','core'], ['legs','cardio']], 4: [['chest','arms'], ['back','core'], ['legs'], ['shoulders','cardio']], 5: [['chest'], ['back'], ['legs'], ['shoulders','arms'], ['core','cardio']], 6: [['chest'], ['back'], ['legs'], ['shoulders'], ['arms'], ['core','cardio']] };
+  function pickExercises(muscles, place, count){ let pool = IF_DATA.exercises.filter(x => muscles.includes(x.muscle)); if(place === 'home') pool = pool.filter(x => x.equip === 'none'); if(!pool.length) pool = IF_DATA.exercises.filter(x => muscles.includes(x.muscle)); const shuffled = [...pool].sort(()=>Math.random()-0.5); return shuffled.slice(0, count); }
+
+  function generateProgram(){
+    const lang = IF.getLang(); const goal = document.getElementById('bGoal').value; const days = parseInt(document.getElementById('bDays').value, 10); const place = document.getElementById('bPlace').value; const split = DAY_SPLITS[days];
+    const dayCards = split.map((muscles, i) => {
+      const perDay = goal === 'fatloss' ? 5 : 4; const exs = pickExercises(muscles, place, perDay);
+      return `<div class="card" style="margin-bottom:16px;"><h4 style="font-size:1rem; margin-bottom:12px;">${lang==='ar'?'يوم':'Day'} ${i+1} — ${muscles.map(m=>lang==='ar'?IF_DATA.muscleGroups.find(g=>g.id===m).ar:IF_DATA.muscleGroups.find(g=>g.id===m).en).join(' + ')}</h4><table><thead><tr><th>${lang==='ar'?'التمرين':'Exercise'}</th><th>${lang==='ar'?'مجموعات × تكرارات':'Sets × Reps'}</th></tr></thead><tbody>${exs.map(ex => `<tr><td>${lang==='ar'?ex.ar:ex.en}</td><td dir="ltr" style="text-align:${lang==='ar'?'end':'start'}">${goal==='strength' ? '4×5' : goal==='fatloss' ? '3×15' : '3×10'}</td></tr>`).join('')}</tbody></table></div>`;
+    }).join('');
+    document.getElementById('builderResult').innerHTML = `<div class="alert alert-success">${lang==='ar' ? 'برنامجك جاهز! خد بالك من الإحماء 5-10 دقايق قبل أي يوم.' : 'Your program is ready! Remember a 5–10 min warm-up before every session.'}</div>${dayCards}`;
+  }
+
+  document.getElementById('genBtn').addEventListener('click', generateProgram);
+
+  renderProgFilter(); renderPrograms();
+  document.addEventListener('if:langchange', ()=>{ renderProgFilter(); renderPrograms(); });
+</script>
+</body>
+</html>

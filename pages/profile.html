@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابي | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="section" style="padding-top:50px;">
+    <div class="container" id="profileWrap" style="max-width:720px;"></div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/challenges.js"></script>
+<script>
+  const goalLabels = { general:{ar:'لياقة عامة',en:'General fitness'}, strength:{ar:'قوة',en:'Strength'}, hypertrophy:{ar:'تضخيم',en:'Hypertrophy'}, fatloss:{ar:'حرق دهون',en:'Fat loss'} };
+
+  function render(){
+    const lang = IF.getLang();
+    const user = getCurrentUser();
+    const wrap = document.getElementById('profileWrap');
+    if(!user){
+      wrap.innerHTML = `
+        <div class="card text-center">
+          <p>${lang==='ar'?'لازم تسجل دخول الأول.':'You need to log in first.'}</p>
+          <a href="login.html" class="btn btn-primary">${lang==='ar'?'تسجيل الدخول':'Login'}</a>
+        </div>`;
+      return;
+    }
+    const initials = user.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+    const plan = IF_DATA.plans.find(p=>p.id===user.plan);
+    const activeChallenges = Object.keys(getChallengeState()).length;
+
+    wrap.innerHTML = `
+      <div class="card flex items-center gap-16" style="margin-bottom:20px;">
+        <div class="avatar" style="width:70px; height:70px; font-size:1.3rem;">${initials}</div>
+        <div style="flex:1;">
+          <h2 style="font-size:1.3rem; margin-bottom:4px;">${user.name}</h2>
+          <p class="text-dim" style="margin:0; font-size:.88rem;" dir="ltr" style="text-align:${lang==='ar'?'end':'start'}">${user.email}</p>
+        </div>
+        <button class="btn btn-outline btn-sm" id="logoutBtn">${lang==='ar'?'تسجيل خروج':'Log out'}</button>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom:20px;">
+        <div class="card text-center"><div style="font-weight:800; font-size:1.1rem;">${lang==='ar'?goalLabels[user.goal].ar:goalLabels[user.goal].en}</div><div class="stat-label">${lang==='ar'?'هدفك':'Goal'}</div></div>
+        <div class="card text-center"><div style="font-weight:800; font-size:1.1rem;">${plan ? (lang==='ar'?plan.ar:plan.en) : '—'}</div><div class="stat-label">${lang==='ar'?'خطتك':'Plan'}</div></div>
+        <div class="card text-center"><div style="font-weight:800; font-size:1.1rem;">${user.joined}</div><div class="stat-label">${lang==='ar'?'تاريخ الانضمام':'Joined'}</div></div>
+      </div>
+
+      <div class="grid grid-2">
+        <a href="progress.html" class="card">
+          <h3 style="font-size:1rem;">${lang==='ar'?'📈 تتبع تقدمك':'📈 Track your progress'}</h3>
+          <p>${lang==='ar'?'سجّل وزنك وشوف منحنى تطورك.':'Log your weight and see your trend.'}</p>
+        </a>
+        <a href="challenges.html" class="card">
+          <h3 style="font-size:1rem;">${lang==='ar'?'🏆 تحدياتك':'🏆 Your challenges'}</h3>
+          <p>${lang==='ar'?`مشترك في ${activeChallenges} تحدي حاليًا.`:`Currently in ${activeChallenges} challenge(s).`}</p>
+        </a>
+        <a href="programs.html" class="card">
+          <h3 style="font-size:1rem;">${lang==='ar'?'📋 برنامجك التدريبي':'📋 Your training program'}</h3>
+          <p>${lang==='ar'?'شوف أو ولّد برنامج جديد.':'View or generate a new program.'}</p>
+        </a>
+        <a href="plans.html" class="card">
+          <h3 style="font-size:1rem;">${lang==='ar'?'💳 إدارة اشتراكك':'💳 Manage your plan'}</h3>
+          <p>${lang==='ar'?'غيّر أو رقّي خطة اشتراكك.':'Change or upgrade your plan.'}</p>
+        </a>
+      </div>
+    `;
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      logoutUser();
+      window.location.href = 'login.html';
+    });
+  }
+  render();
+  document.addEventListener('if:langchange', render);
+</script>
+</body>
+</html>

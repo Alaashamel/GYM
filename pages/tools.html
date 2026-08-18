@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الحاسبات | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .timer-display{ font-family: var(--font-display); font-size:3.2rem; font-weight:800; text-align:center; margin:20px 0; }
+</style>
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container">
+    <div class="eyebrow" style="justify-content:center;" data-ar="الأدوات" data-en="Tools">الأدوات</div>
+    <h1 data-ar="حاسبات دقيقة لكل قرار رياضي" data-en="Precise calculators for every fitness decision">حاسبات دقيقة لكل قرار رياضي</h1>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="tabs" data-panels="toolPanels" id="toolTabs">
+        <button class="tab-btn active" data-tab="bmiPanel" data-ar="BMI" data-en="BMI">BMI</button>
+        <button class="tab-btn" data-tab="tdeePanel" data-ar="السعرات اليومية" data-en="Daily Calories">السعرات اليومية</button>
+        <button class="tab-btn" data-tab="rmPanel" data-ar="1RM" data-en="1RM">1RM</button>
+        <button class="tab-btn" data-tab="burnPanel" data-ar="السعرات المحروقة" data-en="Calories Burned">السعرات المحروقة</button>
+        <button class="tab-btn" data-tab="timerPanel" data-ar="مؤقت الراحة" data-en="Rest Timer">مؤقت الراحة</button>
+      </div>
+
+      <div id="toolPanels">
+        <!-- BMI -->
+        <div class="tab-panel active" id="bmiPanel">
+          <div class="card" style="max-width:520px;">
+            <div class="field-row">
+              <div class="field"><label data-ar="الوزن (كجم)" data-en="Weight (kg)">الوزن (كجم)</label><input type="number" id="bmiWeight" value="75"></div>
+              <div class="field"><label data-ar="الطول (سم)" data-en="Height (cm)">الطول (سم)</label><input type="number" id="bmiHeight" value="175"></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="bmiBtn" data-ar="احسب" data-en="Calculate">احسب</button>
+            <div class="result-box hidden" id="bmiResult"></div>
+          </div>
+        </div>
+
+        <!-- TDEE -->
+        <div class="tab-panel" id="tdeePanel">
+          <div class="card" style="max-width:560px;">
+            <div class="field-row">
+              <div class="field"><label data-ar="الجنس" data-en="Gender">الجنس</label>
+                <select id="tGender"><option value="male" data-ar="ذكر" data-en="Male">ذكر</option><option value="female" data-ar="أنثى" data-en="Female">أنثى</option></select></div>
+              <div class="field"><label data-ar="العمر" data-en="Age">العمر</label><input type="number" id="tAge" value="25"></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label data-ar="الوزن (كجم)" data-en="Weight (kg)">الوزن (كجم)</label><input type="number" id="tWeight" value="75"></div>
+              <div class="field"><label data-ar="الطول (سم)" data-en="Height (cm)">الطول (سم)</label><input type="number" id="tHeight" value="175"></div>
+            </div>
+            <div class="field">
+              <label data-ar="مستوى النشاط" data-en="Activity level">مستوى النشاط</label>
+              <select id="tActivity">
+                <option value="sedentary" data-ar="خامل (بدون رياضة)" data-en="Sedentary (little/no exercise)">خامل (بدون رياضة)</option>
+                <option value="light" data-ar="نشاط خفيف (1-3 أيام)" data-en="Light (1-3 days/wk)">نشاط خفيف (1-3 أيام)</option>
+                <option value="moderate" selected data-ar="نشاط متوسط (3-5 أيام)" data-en="Moderate (3-5 days/wk)">نشاط متوسط (3-5 أيام)</option>
+                <option value="active" data-ar="نشاط عالي (6-7 أيام)" data-en="Active (6-7 days/wk)">نشاط عالي (6-7 أيام)</option>
+                <option value="veryactive" data-ar="نشاط عالي جدًا (رياضي)" data-en="Very active (athlete)">نشاط عالي جدًا (رياضي)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-ar="هدفك" data-en="Goal">هدفك</label>
+              <select id="tGoal">
+                <option value="lose" data-ar="نزول وزن" data-en="Lose weight">نزول وزن</option>
+                <option value="maintain" selected data-ar="ثبات الوزن" data-en="Maintain weight">ثبات الوزن</option>
+                <option value="gain" data-ar="زيادة وزن/عضل" data-en="Gain weight/muscle">زيادة وزن/عضل</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-block" id="tdeeBtn" data-ar="احسب سعراتي" data-en="Calculate My Calories">احسب سعراتي</button>
+            <div class="result-box hidden" id="tdeeResult"></div>
+          </div>
+        </div>
+
+        <!-- 1RM -->
+        <div class="tab-panel" id="rmPanel">
+          <div class="card" style="max-width:480px;">
+            <div class="field-row">
+              <div class="field"><label data-ar="الوزن المرفوع (كجم)" data-en="Weight lifted (kg)">الوزن المرفوع (كجم)</label><input type="number" id="rmWeight" value="80"></div>
+              <div class="field"><label data-ar="عدد التكرارات" data-en="Reps performed">عدد التكرارات</label><input type="number" id="rmReps" value="5"></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="rmBtn" data-ar="احسب أقصى وزن" data-en="Calculate 1RM">احسب أقصى وزن</button>
+            <div class="result-box hidden" id="rmResult"></div>
+          </div>
+        </div>
+
+        <!-- Calories burned -->
+        <div class="tab-panel" id="burnPanel">
+          <div class="card" style="max-width:520px;">
+            <div class="field">
+              <label data-ar="نوع النشاط" data-en="Activity">نوع النشاط</label>
+              <select id="burnActivity">
+                <option value="running" data-ar="جري" data-en="Running">جري</option>
+                <option value="cycling" data-ar="دراجة" data-en="Cycling">دراجة</option>
+                <option value="swimming" data-ar="سباحة" data-en="Swimming">سباحة</option>
+                <option value="weights" data-ar="أثقال" data-en="Weight training">أثقال</option>
+                <option value="walking" data-ar="مشي" data-en="Walking">مشي</option>
+                <option value="jumprope" data-ar="نط حبل" data-en="Jump rope">نط حبل</option>
+                <option value="yoga" data-ar="يوجا" data-en="Yoga">يوجا</option>
+                <option value="hiit" data-ar="HIIT" data-en="HIIT">HIIT</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <div class="field"><label data-ar="وزنك (كجم)" data-en="Your weight (kg)">وزنك (كجم)</label><input type="number" id="burnWeight" value="75"></div>
+              <div class="field"><label data-ar="المدة (دقيقة)" data-en="Duration (min)">المدة (دقيقة)</label><input type="number" id="burnMinutes" value="30"></div>
+            </div>
+            <button class="btn btn-primary btn-block" id="burnBtn" data-ar="احسب السعرات المحروقة" data-en="Calculate Calories Burned">احسب السعرات المحروقة</button>
+            <div class="result-box hidden" id="burnResult"></div>
+          </div>
+        </div>
+
+        <!-- Rest timer -->
+        <div class="tab-panel" id="timerPanel">
+          <div class="card text-center" style="max-width:420px;">
+            <div class="chip-group" id="timerPresets" style="justify-content:center; margin-bottom:10px;">
+              <button class="chip active" data-sec="30">30s</button>
+              <button class="chip" data-sec="60">60s</button>
+              <button class="chip" data-sec="90">90s</button>
+              <button class="chip" data-sec="120">120s</button>
+            </div>
+            <div class="timer-display" id="timerDisplay">00:30</div>
+            <div class="flex gap-12 justify-between">
+              <button class="btn btn-primary btn-block" id="timerStart" data-ar="ابدأ" data-en="Start">ابدأ</button>
+              <button class="btn btn-outline btn-block" id="timerReset" data-ar="إعادة" data-en="Reset">إعادة</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/calculators.js"></script>
+<script src="../js/timer.js"></script>
+<script>
+  document.getElementById('bmiBtn').addEventListener('click', ()=>{
+    const lang = IF.getLang();
+    const w = parseFloat(document.getElementById('bmiWeight').value);
+    const h = parseFloat(document.getElementById('bmiHeight').value);
+    if(!w || !h) return;
+    const r = calcBMI(w, h);
+    const box = document.getElementById('bmiResult');
+    box.classList.remove('hidden');
+    box.innerHTML = `<div class="result-num">${r.bmi}</div><div style="color:${r.color}; font-weight:700; margin-top:6px;">${lang==='ar'?r.catAr:r.catEn}</div>`;
+  });
+
+  document.getElementById('tdeeBtn').addEventListener('click', ()=>{
+    const lang = IF.getLang();
+    const gender = document.getElementById('tGender').value;
+    const age = parseFloat(document.getElementById('tAge').value);
+    const w = parseFloat(document.getElementById('tWeight').value);
+    const h = parseFloat(document.getElementById('tHeight').value);
+    const activity = document.getElementById('tActivity').value;
+    const goal = document.getElementById('tGoal').value;
+    if(!w||!h||!age) return;
+    const bmr = calcBMR(w,h,age,gender);
+    const tdee = calcTDEE(bmr, activity);
+    const goalCal = calcGoalCalories(tdee, goal);
+    const macros = calcMacros(goalCal, goal);
+    const box = document.getElementById('tdeeResult');
+    box.classList.remove('hidden');
+    box.innerHTML = `
+      <div class="result-num">${goalCal}</div>
+      <div style="color:var(--text-dim); margin-bottom:14px;">${lang==='ar'?'سعرة حرارية / يوم':'kcal / day'}</div>
+      <div class="grid grid-3" style="text-align:center;">
+        <div><div style="font-weight:800; font-size:1.2rem;">${macros.protein}g</div><div class="stat-label">${lang==='ar'?'بروتين':'Protein'}</div></div>
+        <div><div style="font-weight:800; font-size:1.2rem;">${macros.carbs}g</div><div class="stat-label">${lang==='ar'?'كاربوهيدرات':'Carbs'}</div></div>
+        <div><div style="font-weight:800; font-size:1.2rem;">${macros.fat}g</div><div class="stat-label">${lang==='ar'?'دهون':'Fat'}</div></div>
+      </div>`;
+  });
+
+  document.getElementById('rmBtn').addEventListener('click', ()=>{
+    const lang = IF.getLang();
+    const w = parseFloat(document.getElementById('rmWeight').value);
+    const reps = parseFloat(document.getElementById('rmReps').value);
+    if(!w||!reps) return;
+    const rm = calc1RM(w, reps);
+    const box = document.getElementById('rmResult');
+    box.classList.remove('hidden');
+    box.innerHTML = `<div class="result-num">${rm} ${lang==='ar'?'كجم':'kg'}</div><div style="color:var(--text-dim);">${lang==='ar'?'أقصى وزن ممكن ترفعه لمرة واحدة (تقديري)':'Estimated one-rep max'}</div>`;
+  });
+
+  document.getElementById('burnBtn').addEventListener('click', ()=>{
+    const lang = IF.getLang();
+    const act = document.getElementById('burnActivity').value;
+    const w = parseFloat(document.getElementById('burnWeight').value);
+    const min = parseFloat(document.getElementById('burnMinutes').value);
+    if(!w||!min) return;
+    const kcal = calcCaloriesBurned(act, w, min);
+    const box = document.getElementById('burnResult');
+    box.classList.remove('hidden');
+    box.innerHTML = `<div class="result-num">${kcal}</div><div style="color:var(--text-dim);">${lang==='ar'?'سعرة حرارية تقريبًا':'estimated kcal'}</div>`;
+  });
+
+  // Rest timer
+  const timer = createRestTimer({ displayEl: document.getElementById('timerDisplay') });
+  timer.setDuration(30);
+  document.getElementById('timerPresets').addEventListener('click', e=>{
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    document.querySelectorAll('#timerPresets .chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    timer.setDuration(parseInt(btn.getAttribute('data-sec'),10));
+  });
+  document.getElementById('timerStart').addEventListener('click', (e)=>{
+    if(timer.isRunning()){ timer.stop(); e.target.setAttribute('data-ar','ابدأ'); e.target.setAttribute('data-en','Start'); e.target.textContent = IF.getLang()==='ar'?'ابدأ':'Start'; }
+    else { timer.start(); e.target.setAttribute('data-ar','إيقاف'); e.target.setAttribute('data-en','Pause'); e.target.textContent = IF.getLang()==='ar'?'إيقاف':'Pause'; }
+  });
+  document.getElementById('timerReset').addEventListener('click', ()=>{
+    timer.reset();
+    const startBtn = document.getElementById('timerStart');
+    startBtn.setAttribute('data-ar','ابدأ'); startBtn.setAttribute('data-en','Start');
+    startBtn.textContent = IF.getLang()==='ar'?'ابدأ':'Start';
+  });
+</script>
+</body>
+</html>

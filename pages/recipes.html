@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وصفات صحية | آيرون فورج</title>
+<link rel="stylesheet" href="../css/style.css">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+<div id="navbar-root"></div>
+
+<main>
+  <section class="page-hero container" data-aos="fade-down">
+    <div class="eyebrow" style="justify-content:center;" data-ar="التغذية" data-en="Nutrition">التغذية</div>
+    <h1 data-ar="وصفات صحية وسريعة" data-en="Quick, healthy recipes">وصفات صحية وسريعة</h1>
+    <p data-ar="وجبات بسيطة بمكونات متوفرة وسعرات محسوبة." data-en="Simple meals with everyday ingredients and calculated calories.">وجبات بسيطة بمكونات متوفرة وسعرات محسوبة.</p>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="chip-group" id="tagFilter" style="margin-bottom:28px;"></div>
+      <div class="grid grid-3" id="recipeGrid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer-root"></div>
+
+<script src="../js/main.js"></script>
+<script src="../js/data.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  let tagFilter = 'all';
+  const tagLabels = { breakfast:{ar:'فطار',en:'Breakfast'}, lunch:{ar:'غدا',en:'Lunch'}, dinner:{ar:'عشا',en:'Dinner'}, snack:{ar:'سناك',en:'Snack'} };
+
+  function renderTagFilter(){
+    const lang = IF.getLang();
+    const tags = ['all', ...new Set(IF_DATA.recipes.map(r=>r.tag))];
+    document.getElementById('tagFilter').innerHTML = tags.map(t => `
+      <button class="chip ${t===tagFilter?'active':''}" data-t="${t}">${t==='all' ? (lang==='ar'?'كل الوصفات':'All Recipes') : (lang==='ar'?tagLabels[t].ar:tagLabels[t].en)}</button>
+    `).join('');
+  }
+
+  function renderRecipes(){
+    const lang = IF.getLang();
+    const list = IF_DATA.recipes.filter(r => tagFilter==='all' || r.tag===tagFilter);
+    document.getElementById('recipeGrid').innerHTML = list.map((r, i) => `
+      <div class="card" data-aos="fade-up" data-aos-delay="${i*50}">
+        <span class="badge" style="margin-bottom:10px;">${lang==='ar'?tagLabels[r.tag].ar:tagLabels[r.tag].en}</span>
+        <h3 style="font-size:1.05rem;">${lang==='ar'?r.ar:r.en}</h3>
+        <div class="flex gap-16" style="margin:10px 0;">
+          <span class="badge badge-accent">${r.kcal} ${lang==='ar'?'سعرة':'kcal'}</span>
+          <span class="badge badge-success">${r.protein}g ${lang==='ar'?'بروتين':'protein'}</span>
+        </div>
+        <ul style="margin-top:10px;">
+          ${(lang==='ar'?r.ingAr:r.ingEn).map(i=>`<li style="color:var(--text-dim); font-size:.88rem; margin-bottom:5px;">• ${i}</li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('tagFilter').addEventListener('click', function(e){
+    const btn = e.target.closest('.chip'); if(!btn) return;
+    tagFilter = btn.getAttribute('data-t'); 
+    renderTagFilter(); 
+    renderRecipes();
+    if(typeof AOS !== 'undefined') AOS.refresh();
+  });
+
+  renderTagFilter(); renderRecipes();
+  document.addEventListener('if:langchange', ()=>{ renderTagFilter(); renderRecipes(); });
+</script>
+</body>
+</html>
