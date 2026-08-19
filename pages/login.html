@@ -55,6 +55,7 @@
 
 <script src="../js/main.js"></script>
 <script src="../js/auth.js"></script>
+<script src="../js/favorites.js"></script>
 <script>
   // if already logged in, go straight to profile
   if(getCurrentUser()) window.location.href = 'profile.html';
@@ -64,7 +65,7 @@
     const email = document.getElementById('lEmail').value.trim();
     const pass = document.getElementById('lPass').value;
     const res = loginUser(email, pass);
-    if(res.ok) window.location.href = 'profile.html';
+    if(res.ok){ migrateGuestFavorites(); window.location.href = 'profile.html'; }
     else document.getElementById('loginError').classList.remove('hidden');
   });
 
@@ -75,7 +76,7 @@
     const pass = document.getElementById('rPass').value;
     const goal = document.getElementById('rGoal').value;
     const res = registerUser({ name, email, password: pass, goal });
-    if(res.ok) window.location.href = 'profile.html';
+    if(res.ok){ migrateGuestFavorites(); window.location.href = 'profile.html'; }
     else document.getElementById('regError').classList.remove('hidden');
   });
 </script>

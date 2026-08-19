@@ -29,7 +29,10 @@
   <section class="section-tight">
     <div class="container">
       <div class="chip-group" id="muscleFilter" style="margin-bottom:14px;"></div>
-      <div class="chip-group" id="equipFilter" style="margin-bottom:32px;"></div>
+      <div class="flex gap-8" style="flex-wrap:wrap; align-items:center; margin-bottom:32px;">
+        <div class="chip-group" id="equipFilter" style="margin:0;"></div>
+        <button class="chip" id="favOnlyChip" style="margin-inline-start:auto;">♥ <span data-ar="المفضلة فقط" data-en="Favorites only">المفضلة فقط</span></button>
+      </div>
       <div class="grid grid-2" id="exGrid"></div>
     </div>
   </section>
@@ -38,11 +41,13 @@
 <div id="footer-root"></div>
 
 <script src="../js/main.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/favorites.js"></script>
 <script src="../js/data.js"></script>
 <script src="../js/exercise-animations.js"></script>
 <script src="../js/exercise-media.js"></script>
 <script>
-  let mFilter = 'all', eFilter = 'all';
+  let mFilter = 'all', eFilter = 'all', favOnly = false;
   const equipList = [
     {id:'all', ar:'الكل', en:'All'}, {id:'none', ar:'بدون جهاز', en:'No Equipment'},
     {id:'barbell', ar:'بار', en:'Barbell'}, {id:'dumbbell', ar:'دمبل', en:'Dumbbell'},
@@ -60,21 +65,24 @@
   function renderExercises(){
     const lang = IF.getLang();
     const list = IF_DATA.exercises.filter(x =>
-      (mFilter==='all' || x.muscle===mFilter) && (eFilter==='all' || x.equip===eFilter)
+      (mFilter==='all' || x.muscle===mFilter) && (eFilter==='all' || x.equip===eFilter) && (!favOnly || isFavorite(x.id))
     );
     const grid = document.getElementById('exGrid');
     if(!list.length){
-      grid.innerHTML = `<p class="text-dim">${lang==='ar'?'مفيش تمارين مطابقة للفلتر ده.':'No exercises match this filter.'}</p>`;
+      grid.innerHTML = `<p class="text-dim">${favOnly ? (lang==='ar'?'لسه مفيش تمارين في المفضلة. اضغط ♥ على أي تمرين عشان تضيفه.':'No favorites yet. Tap ♥ on any exercise to add it.') : (lang==='ar'?'مفيش تمارين مطابقة للفلتر ده.':'No exercises match this filter.')}</p>`;
       return;
     }
     grid.innerHTML = list.map(x => {
       const lvl = levelBadge[x.level];
       const pLabel = PATTERN_LABELS[x.pattern];
+      const fav = isFavorite(x.id);
       return `
       <div class="card ex-card" data-id="${x.id}" data-reveal>
         <div class="ex-media">
           ${getExerciseMedia(x)}
           <div class="ex-media-badge"><i></i>${lang==='ar'?'حركة توضيحية':'Motion Guide'}</div>
+          <div class="ex-rep-badge" data-rep-badge>${lang==='ar'?'عدة':'REP'} <span data-rep-count>1</span></div>
+          <button class="ex-fav-btn ${fav?'active':''}" data-fav-btn data-id="${x.id}" title="${lang==='ar'?'أضف للمفضلة':'Add to favorites'}">${fav?'♥':'♡'}</button>
         </div>
         <div class="ex-card-body">
           <div class="ex-head">
@@ -100,7 +108,36 @@
     grid.querySelectorAll('.ex-card').forEach(card=>{
       card.addEventListener('click', ()=> card.classList.toggle('open'));
     });
+    grid.querySelectorAll('[data-fav-btn]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const id = btn.getAttribute('data-id');
+        const nowFav = toggleFavorite(id);
+        btn.classList.toggle('active', nowFav);
+        btn.textContent = nowFav ? '♥' : '♡';
+        btn.classList.remove('fav-pop'); void btn.offsetWidth; btn.classList.add('fav-pop');
+        if(favOnly && !nowFav) renderExercises();
+      });
+    });
+    initRepCounters(grid);
     IF.initReveal();
+  }
+
+  // عداد عدات حي (Rep Counter) بيتزامن مع أنيميشن كل تمرين — بيدي إحساس إن الحركة حقيقية زي ست تدريب فعلي
+  function initRepCounters(grid){
+    grid.querySelectorAll('.ex-media').forEach(media=>{
+      const motionEl = media.querySelector('.motion-body');
+      const countEl = media.querySelector('[data-rep-count]');
+      if(!motionEl || !countEl) return;
+      let reps = 1;
+      countEl.textContent = reps;
+      motionEl.addEventListener('animationiteration', ()=>{
+        reps = reps >= 4 ? 1 : reps + 1;
+        countEl.textContent = reps;
+        const badge = media.querySelector('[data-rep-badge]');
+        if(badge){ badge.classList.remove('rep-bump'); void badge.offsetWidth; badge.classList.add('rep-bump'); }
+      });
+    });
   }
 
   document.getElementById('muscleFilter').addEventListener('click', e=>{
@@ -111,9 +148,21 @@
     const btn = e.target.closest('.chip'); if(!btn) return;
     eFilter = btn.getAttribute('data-e'); renderFilters(); renderExercises();
   });
+  document.getElementById('favOnlyChip').addEventListener('click', ()=>{
+    favOnly = !favOnly;
+    document.getElementById('favOnlyChip').classList.toggle('active', favOnly);
+    renderExercises();
+  });
+
+  // لو المستخدم فتح الصفحة بلينك فيه #favorites (مثلاً من صفحة البروفايل)، نفعّل فلتر المفضلة تلقائيًا
+  if(location.hash === '#favorites'){
+    favOnly = true;
+    document.getElementById('favOnlyChip').classList.add('active');
+  }
 
   renderFilters(); renderExercises();
   document.addEventListener('if:langchange', ()=>{ renderFilters(); renderExercises(); });
+  document.addEventListener('if:favoriteschange', ()=>{ if(favOnly) renderExercises(); });
 </script>
 </body>
 </html>
