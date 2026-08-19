@@ -20,12 +20,20 @@
       <div class="grid grid-2" style="align-items:start;">
         <div class="card">
           <div id="successMsg" class="alert alert-success hidden" data-ar="تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت." data-en="Your message was sent! We'll get back to you soon.">تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت.</div>
-          <form id="contactForm">
-            <div class="field"><label data-ar="الاسم" data-en="Name">الاسم</label><input type="text" id="cName" required></div>
+          <div id="formError" class="alert alert-danger hidden" data-ar="من فضلك املأ جميع الحقول بشكل صحيح." data-en="Please fill in all fields correctly.">من فضلك املأ جميع الحقول بشكل صحيح.</div>
+          <form id="contactForm" action="https://formspree.io/f/maewlvza" method="POST">
+            <div class="field">
+              <label data-ar="تواصل مع" data-en="Contact Person">تواصل مع</label>
+              <select id="cRecipient" required>
+                <option value="" disabled selected data-ar="اختر الشخص" data-en="Choose person">اختر الشخص</option>
+                <option value="trainer" data-ar="المدرب" data-en="Trainer">المدرب</option>
+                <option value="manager" data-ar="المدير" data-en="Manager">المدير</option>
+              </select>
+            </div>
+            <div class="field"><label data-ar="الاسم" data-en="Name">الاسم</label><input type="text" id="cName" required minlength="2"></div>
             <div class="field"><label data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label><input type="email" id="cEmail" required></div>
-            <div class="field"><label data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label><input type="tel" id="cPhone"></div>
-            <div class="field"><label data-ar="رسالتك" data-en="Message">رسالتك</label><textarea id="cMessage" rows="5" required></textarea></div>
-            <div id="formError" class="alert alert-danger hidden" data-ar="من فضلك املأ الاسم والإيميل والرسالة بشكل صحيح." data-en="Please fill in a valid name, email, and message.">من فضلك املأ الاسم والإيميل والرسالة بشكل صحيح.</div>
+            <div class="field"><label data-ar="رقم التليفون" data-en="Phone">رقم التليفون</label><input type="tel" id="cPhone" placeholder="01xxxxxxxxx"></div>
+            <div class="field"><label data-ar="رسالتك" data-en="Message">رسالتك</label><textarea id="cMessage" rows="5" required minlength="10"></textarea></div>
             <button type="submit" class="btn btn-primary btn-block" data-ar="إرسال الرسالة" data-en="Send Message">إرسال الرسالة</button>
           </form>
         </div>
@@ -34,12 +42,12 @@
           <div class="card" style="margin-bottom:20px;">
             <h3 style="font-size:1rem;" data-ar="بيانات التواصل" data-en="Contact Info">بيانات التواصل</h3>
             <p style="margin-bottom:6px;" data-ar="📍 شارع الرياضة، الجيزة، مصر" data-en="📍 Sports St., Giza, Egypt">📍 شارع الرياضة، الجيزة، مصر</p>
-            <p style="margin-bottom:6px;" dir="ltr" class="text-dim">📞 01000000000</p>
+            <p style="margin-bottom:6px;" dir="ltr" class="text-dim" id="contactPhone">📞 01000000000</p>
             <p style="margin-bottom:6px;" dir="ltr" class="text-dim">✉️ info@ironforge-gym.com</p>
             <p data-ar="🕐 يوميًا من 7 صباحًا حتى 12 منتصف الليل" data-en="🕐 Daily, 7 AM – Midnight">🕐 يوميًا من 7 صباحًا حتى 12 منتصف الليل</p>
           </div>
           <div class="card" style="padding:0; overflow:hidden;">
-            <iframe title="map" src="https://www.google.com/maps?q=Giza,Egypt&output=embed" width="100%" height="280" style="border:0; display:block;" loading="lazy"></iframe>
+            <iframe title="map" src="https://www.google.com/maps?q=Giza,Badrashin,Bank+masr&output=embed" width="100%" height="280" style="border:0; display:block;" loading="lazy" allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -51,21 +59,71 @@
 
 <script src="../js/main.js"></script>
 <script>
-  document.getElementById('contactForm').addEventListener('submit', (e)=>{
+  const recipients = {
+    trainer: { ar: 'المدرب', en: 'Trainer', phone: '01122743082' },
+    manager: { ar: 'المدير', en: 'Manager', phone: '01103240977' }
+  };
+  const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+
+  document.getElementById('cRecipient').addEventListener('change', function(){
+    const phoneEl = document.getElementById('contactPhone');
+    if(this.value && recipients[this.value]){
+      phoneEl.textContent = '📞 ' + recipients[this.value].phone;
+    }
+  });
+
+  document.getElementById('contactForm').addEventListener('submit', function(e){
     e.preventDefault();
     const name = document.getElementById('cName').value.trim();
     const email = document.getElementById('cEmail').value.trim();
+    const phone = document.getElementById('cPhone').value.trim();
     const msg = document.getElementById('cMessage').value.trim();
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const recipient = document.getElementById('cRecipient').value;
     const errBox = document.getElementById('formError');
     const okBox = document.getElementById('successMsg');
-    if(!name || !emailOk || !msg){
+
+    if(!recipient || !name || !email || !msg){
+      errBox.textContent = lang === 'ar' ? 'من فضلك اختر الشخص واملأ الاسم والإيميل والرسالة.' : 'Please choose a person and fill in name, email, and message.';
       errBox.classList.remove('hidden'); okBox.classList.add('hidden');
       return;
     }
-    errBox.classList.add('hidden');
-    okBox.classList.remove('hidden');
-    document.getElementById('contactForm').reset();
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if(!emailOk){
+      errBox.textContent = lang === 'ar' ? 'البريد الإلكتروني غير صحيح.' : 'Please enter a valid email address.';
+      errBox.classList.remove('hidden'); okBox.classList.add('hidden');
+      return;
+    }
+
+    if(phone && !/^01[0-9]{9}$/.test(phone)){
+      errBox.textContent = lang === 'ar' ? 'رقم التليفون غير صحيح. يجب أن يبدأ بـ 01 ويتكون من 11 رقم.' : 'Phone number is invalid. It must start with 01 and be 11 digits.';
+      errBox.classList.remove('hidden'); okBox.classList.add('hidden');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('message', msg);
+    formData.append('recipient', recipient);
+    formData.append('recipient_phone', recipients[recipient].phone);
+    formData.append('_subject', lang === 'ar' ? 'رسالة جديدة من موقع آيرون فورج' : 'New message from Iron Forge website');
+    formData.append('_replyto', email);
+
+    fetch(this.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    }).then(() => {
+      errBox.classList.add('hidden');
+      okBox.classList.remove('hidden');
+      this.reset();
+      document.getElementById('contactPhone').textContent = '📞 01000000000';
+    }).catch(() => {
+      errBox.textContent = lang === 'ar' ? 'حدث خطأ في الإرسال. حاول مرة أخرى.' : 'Something went wrong. Please try again.';
+      errBox.classList.remove('hidden'); okBox.classList.add('hidden');
+    });
   });
 </script>
 </body>

@@ -107,12 +107,10 @@ const IF = (() => {
     return `<div class="mobile-bottom-nav">` + items.map(item => {
       if(item.group){
         const links = item.items.map(it => {
-          // تم إضافة onClick event لإغلاق القائمة المنسدلة عند الضغط على الرابط
-          return `<a href="${hrefFor(it.file)}" onclick="this.closest('details').removeAttribute('open')">${it.label}</a>`;
+          return `<a href="${hrefFor(it.file)}">${it.label}</a>`;
         }).join('');
-        const isOpen = item.items.some(it => it.file === CURRENT_FILE);
         return `
-        <details class="nav-dropdown" ${isOpen ? 'open' : ''}>
+        <details class="nav-dropdown">
           <summary><span style="font-size:1.3rem; display:block; margin-bottom:2px;">${item.icon}</span>${item.label}</summary>
           <div class="dropdown-panel">${links}</div>
         </details>`;
