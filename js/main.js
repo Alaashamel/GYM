@@ -38,11 +38,12 @@ const IF = (() => {
   function navLinkHTML(item, lang){
     const label = lang === 'ar' ? item.ar : item.en;
     if(item.group){
+      const groupActive = item.items.some(it => it.file === CURRENT_FILE);
       const links = item.items.map(it => {
         const active = it.file === CURRENT_FILE ? ' style="color:var(--accent)"' : '';
         return `<a href="${hrefFor(it.file)}"${active}>${lang==='ar'?it.ar:it.en}</a>`;
       }).join('');
-      return `<details class="nav-dropdown"><summary>${label}</summary><div class="dropdown-panel">${links}</div></details>`;
+      return `<details class="nav-dropdown"><summary${groupActive ? ' style="color:var(--accent)"' : ''}>${label}</summary><div class="dropdown-panel">${links}</div></details>`;
     }
     const href = item.href();
     const isActive = (item.file === CURRENT_FILE) || (item.file === null && (CURRENT_FILE === 'index.html'));
@@ -106,12 +107,14 @@ const IF = (() => {
 
     return `<div class="mobile-bottom-nav">` + items.map(item => {
       if(item.group){
+        const groupActive = item.items.some(it => it.file === CURRENT_FILE);
         const links = item.items.map(it => {
-          return `<a href="${hrefFor(it.file)}">${it.label}</a>`;
+          const active = it.file === CURRENT_FILE ? ' class="active" style="color:var(--accent)"' : '';
+          return `<a href="${hrefFor(it.file)}"${active}>${it.label}</a>`;
         }).join('');
         return `
         <details class="nav-dropdown">
-          <summary><span style="font-size:1.3rem; display:block; margin-bottom:2px;">${item.icon}</span>${item.label}</summary>
+          <summary${groupActive ? ' style="color:var(--accent)"' : ''}><span style="font-size:1.3rem; display:block; margin-bottom:2px;">${item.icon}</span>${item.label}</summary>
           <div class="dropdown-panel">${links}</div>
         </details>`;
       } else {
