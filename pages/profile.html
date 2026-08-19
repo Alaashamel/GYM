@@ -19,6 +19,7 @@
 
 <script src="../js/main.js"></script>
 <script src="../js/auth.js"></script>
+<script src="../js/favorites.js"></script>
 <script src="../js/data.js"></script>
 <script src="../js/challenges.js"></script>
 <script>
@@ -72,6 +73,10 @@
         <a href="plans.html" class="card">
           <h3 style="font-size:1rem;">${lang==='ar'?'💳 إدارة اشتراكك':'💳 Manage your plan'}</h3>
           <p>${lang==='ar'?'غيّر أو رقّي خطة اشتراكك.':'Change or upgrade your plan.'}</p>
+        </a>
+        <a href="exercises.html#favorites" class="card">
+          <h3 style="font-size:1rem;">${lang==='ar'?'♥ تمارينك المفضلة':'♥ Your favorite exercises'}</h3>
+          <p>${lang==='ar'?`عندك ${getFavoriteCount()} تمرين محفوظ في المفضلة.`:`You have ${getFavoriteCount()} exercise(s) saved.`}</p>
         </a>
       </div>
     `;
