@@ -21,7 +21,7 @@
         <div class="card">
           <div id="successMsg" class="alert alert-success hidden" data-ar="تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت." data-en="Your message was sent! We'll get back to you soon.">تم إرسال رسالتك بنجاح! هنرد عليك في أقرب وقت.</div>
           <div id="formError" class="alert alert-danger hidden" data-ar="من فضلك املأ جميع الحقول بشكل صحيح." data-en="Please fill in all fields correctly.">من فضلك املأ جميع الحقول بشكل صحيح.</div>
-          <form id="contactForm" action="https://formspree.io/f/maewlvza" method="POST">
+          <form id="contactForm" action="https://formsubmit.co/abdo120056789.9@gmail.com" method="POST">
             <div class="field">
               <label data-ar="تواصل مع" data-en="Contact Person">تواصل مع</label>
               <select id="cRecipient" required>
@@ -110,6 +110,8 @@
     formData.append('recipient_phone', recipients[recipient].phone);
     formData.append('_subject', lang === 'ar' ? 'رسالة جديدة من موقع آيرون فورج' : 'New message from Iron Forge website');
     formData.append('_replyto', email);
+    formData.append('_template', 'table');
+    formData.append('_captcha', 'false');
 
     fetch(this.action, {
       method: 'POST',
