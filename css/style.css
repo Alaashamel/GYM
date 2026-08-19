@@ -141,18 +141,29 @@ p{ margin:0 0 1em; color: var(--text-dim); }
   
   /* ---- Bottom Nav Bar (المسافات مضبوطة ومستوية) ---- */
   .mobile-bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-    background: color-mix(in srgb, var(--bg) 96%, transparent);
-    backdrop-filter: blur(20px); border-top: 1px solid var(--border);
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: calc(75px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 30px rgba(0,0,0,.25);
     display: flex; justify-content: space-around; align-items: center;
-    z-index: 999; padding: 0 4px;
+    z-index: 999; padding-inline: 4px;
+    animation: bottomNavRise .45s cubic-bezier(.22,1,.36,1);
   }
+  @keyframes bottomNavRise { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .mobile-bottom-nav a, .mobile-bottom-nav .nav-dropdown {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-decoration: none; color: var(--text-dim); font-size: .6rem;
-    gap: 2px; padding: 4px 6px; border-radius: 12px; transition: all .2s ease;
+    gap: 2px; padding: 4px 6px; border-radius: 12px;
+    transition: color .25s ease, background .25s ease, transform .18s cubic-bezier(.34,1.56,.64,1);
     font-weight: 600; position: relative; flex: 1; /* توزيع المساحات بالتساوي */
     min-height: 60px; /* توحيد الارتفاع لمنع النزول والصعود */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-bottom-nav a:active, .mobile-bottom-nav .nav-dropdown summary:active {
+    transform: scale(.88);
   }
   .mobile-bottom-nav a svg, .mobile-bottom-nav .nav-dropdown summary svg {
     width: 24px; height: 24px; stroke: currentColor; fill: none;
@@ -160,27 +171,45 @@ p{ margin:0 0 1em; color: var(--text-dim); }
   /* توحيد حجم الايقونات (Emojis) */
   .mobile-bottom-nav a span:first-child, .mobile-bottom-nav .nav-dropdown summary span:first-child {
     font-size: 1.5rem; display: block; margin-bottom: 2px; line-height: 1;
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1), filter .25s ease;
   }
   .mobile-bottom-nav a.active, .mobile-bottom-nav .nav-dropdown[open] summary {
     color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent);
   }
-  
+  .mobile-bottom-nav a.active span:first-child, .mobile-bottom-nav .nav-dropdown[open] summary span:first-child {
+    transform: translateY(-2px) scale(1.12);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent) 60%, transparent));
+  }
+  .mobile-bottom-nav a.active::before {
+    content: ""; position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 3px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), #FFB020);
+    animation: navDotIn .3s ease;
+  }
+  @keyframes navDotIn { from { width: 0; opacity: 0; } to { width: 18px; opacity: 1; } }
+
   .mobile-bottom-nav .nav-dropdown { position: relative; }
-  .mobile-bottom-nav .nav-dropdown summary { list-style: none; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: inherit; padding:0; background:transparent; font-weight: 600; font-size: .6rem; min-height: 60px; justify-content: center; }
+  .mobile-bottom-nav .nav-dropdown summary { list-style: none; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: inherit; padding:0; background:transparent; font-weight: 600; font-size: .6rem; min-height: 60px; justify-content: center; -webkit-tap-highlight-color: transparent; }
   .mobile-bottom-nav .nav-dropdown summary::-webkit-details-marker { display: none; }
-  
+
   .mobile-bottom-nav .dropdown-panel {
     position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 8px; min-width: 130px; margin-bottom: 12px; box-shadow: 0 -8px 30px rgba(0,0,0,0.7);
+    animation: dropdownPanelIn .22s cubic-bezier(.22,1,.36,1);
   }
+  @keyframes dropdownPanelIn { from { opacity:0; transform: translateX(-50%) translateY(8px) scale(.94); } to { opacity:1; transform: translateX(-50%) translateY(0) scale(1); } }
   .mobile-bottom-nav .dropdown-panel a {
     padding: 8px 12px; font-size: .85rem; display: flex; align-items: center; justify-content: flex-start;
     width: 100%; background: transparent; color: var(--text); border-radius: 8px; gap: 8px; min-height: auto;
   }
   .mobile-bottom-nav .dropdown-panel a:hover { background: var(--surface-alt); }
+  .mobile-bottom-nav .dropdown-panel a:active { transform: scale(.96); }
 
-  body{ padding-bottom: 90px; }
+  body{ padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-bottom-nav, .mobile-bottom-nav a, .mobile-bottom-nav .dropdown-panel, .mobile-bottom-nav a span:first-child { animation: none !important; transition: none !important; }
 }
 
 /* ---- Cards ---- */
@@ -280,6 +309,19 @@ th{ color: var(--text-dim); font-weight:700; font-size:.8rem; text-transform:upp
 .ex-media::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.05),transparent 55%,rgba(0,0,0,.24));}
 .ex-media-badge{position:absolute;top:14px;inset-inline-end:14px;z-index:2;display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(8,11,15,.72);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.03em}
 .ex-media-badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:mediaPulse 1.5s ease-in-out infinite}
+.ex-rep-badge{position:absolute;bottom:14px;inset-inline-start:14px;z-index:2;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#FFB020);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 16px rgba(255,90,30,.4);}
+.ex-rep-badge span{font-size:.85rem;}
+.ex-rep-badge.rep-bump{animation:repBump .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes repBump{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.ex-rep-badge.rep-bump{animation:none!important}}
+
+.ex-fav-btn{position:absolute;top:14px;inset-inline-start:14px;z-index:3;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(8,11,15,.6);backdrop-filter:blur(10px);color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .2s ease, color .2s ease;}
+.ex-fav-btn:hover{transform:scale(1.08);}
+.ex-fav-btn.active{color:#FF4B6A;background:rgba(255,75,106,.16);border-color:rgba(255,75,106,.4);}
+.ex-fav-btn.fav-pop{animation:favPop .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes favPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+#favOnlyChip.active{background:linear-gradient(90deg,#FF4B6A,#FF4B1F);color:#fff;border-color:transparent;}
+@media(prefers-reduced-motion:reduce){.ex-fav-btn.fav-pop{animation:none!important}}
 .ex-card-body{padding:22px 28px 28px;}
 .ex-card .ex-head{align-items:center;}
 .ex-card .pattern-box{display:none;}
@@ -306,22 +348,25 @@ th{ color: var(--text-dim); font-weight:700; font-size:.8rem; text-transform:upp
 .motion-guide,.motion-cable{animation:guidePulse 1.8s ease-in-out infinite;}
 @keyframes mediaPulse{50%{opacity:.45;transform:scale(.72)}100%{opacity:1;transform:scale(1)}}
 @keyframes exerciseBreath{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes benchPress{0%,100%{transform:translateY(8px)}50%{transform:translateY(-15px)}}
-@keyframes dbPress{0%,100%{transform:translateY(7px) scale(.99)}50%{transform:translateY(-14px) scale(1)}}
-@keyframes pushupMove{0%,100%{transform:translateY(7px)}50%{transform:translateY(-12px)}}
-@keyframes pullDown{0%,100%{transform:translateY(-12px)}50%{transform:translateY(12px)}}
-@keyframes hingeMove{0%,100%{transform:rotate(3deg)}50%{transform:rotate(-12deg)}}
-@keyframes squatMove{0%,100%{transform:translateY(5px) scaleY(1)}50%{transform:translateY(22px) scaleY(.92)}}
-@keyframes lungeMove{0%,100%{transform:translateY(4px)}50%{transform:translateY(20px)}}
-@keyframes legPressMove{0%,100%{transform:translateX(5px)}50%{transform:translateX(35px)}}
-@keyframes ohpMove{0%,100%{transform:translateY(8px)}50%{transform:translateY(-17px)}}
-@keyframes lateralMove{0%,100%{transform:translateY(8px) scaleY(.98)}50%{transform:translateY(-7px) scaleY(1.02)}}
-@keyframes curlMove{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-6deg)}}
+/* تايمنج واقعي: نزول (Eccentric) بطيء ومتحكم فيه، وقفة قصيرة عند أقصى انقباض، وصعود (Concentric) أسرع شوية — زي الأداء الحقيقي في الجيم */
+@keyframes benchPress{0%{transform:translateY(9px)}48%{transform:translateY(-15px)}58%{transform:translateY(-15px)}100%{transform:translateY(9px)}}
+@keyframes dbPress{0%{transform:translateY(8px) scale(.99)}48%{transform:translateY(-14px) scale(1)}58%{transform:translateY(-14px) scale(1)}100%{transform:translateY(8px) scale(.99)}}
+@keyframes pushupMove{0%{transform:translateY(8px)}45%{transform:translateY(-12px)}55%{transform:translateY(-12px)}100%{transform:translateY(8px)}}
+@keyframes pullDown{0%{transform:translateY(-12px)}48%{transform:translateY(13px)}58%{transform:translateY(13px)}100%{transform:translateY(-12px)}}
+@keyframes hingeMove{0%{transform:rotate(3deg)}48%{transform:rotate(-13deg)}58%{transform:rotate(-13deg)}100%{transform:rotate(3deg)}}
+@keyframes squatMove{0%{transform:translateY(4px) scaleY(1)}48%{transform:translateY(23px) scaleY(.91)}60%{transform:translateY(23px) scaleY(.91)}100%{transform:translateY(4px) scaleY(1)}}
+@keyframes lungeMove{0%{transform:translateY(3px)}48%{transform:translateY(21px)}58%{transform:translateY(21px)}100%{transform:translateY(3px)}}
+@keyframes legPressMove{0%{transform:translateX(4px)}48%{transform:translateX(36px)}58%{transform:translateX(36px)}100%{transform:translateX(4px)}}
+@keyframes ohpMove{0%{transform:translateY(9px)}48%{transform:translateY(-18px)}58%{transform:translateY(-18px)}100%{transform:translateY(9px)}}
+@keyframes lateralMove{0%{transform:translateY(8px) scaleY(.98)}45%{transform:translateY(-8px) scaleY(1.02)}55%{transform:translateY(-8px) scaleY(1.02)}100%{transform:translateY(8px) scaleY(.98)}}
+@keyframes curlMove{0%{transform:rotate(2deg)}45%{transform:rotate(-7deg)}55%{transform:rotate(-7deg)}100%{transform:rotate(2deg)}}
 @keyframes plankMove{0%,100%{transform:translateY(2px)}50%{transform:translateY(-4px)}}
-@keyframes crunchMove{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg) translateY(-7px)}}
+@keyframes crunchMove{0%{transform:rotate(0)}45%{transform:rotate(-10deg) translateY(-8px)}55%{transform:rotate(-10deg) translateY(-8px)}100%{transform:rotate(0)}}
 @keyframes runMove{from{transform:translateY(5px) rotate(-2deg)}to{transform:translateY(-5px) rotate(2deg)}}
 @keyframes jumpMove{0%,100%{transform:translateY(7px)}50%{transform:translateY(-13px)}}
 @keyframes ropeSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes guidePulse{50%{opacity:.25}}
+@keyframes muscleFlash{0%,42%{opacity:0}50%,58%{opacity:1}100%{opacity:0}}
+.muscle-target{ animation: muscleFlash 2.8s ease-in-out infinite; transform-box: fill-box; }
 @media(max-width:640px){.ex-card-body{padding:18px}.ex-media-badge{top:10px;inset-inline-end:10px}.ex-card.open .ex-details{max-height:850px}}
 @media(prefers-reduced-motion:reduce){.motion-body,.motion-rope,.motion-guide,.motion-cable,.ex-media-badge i{animation:none!important}}
