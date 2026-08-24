@@ -5,16 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مكتبة التمارين | آيرون فورج</title>
 <link rel="stylesheet" href="../css/style.css">
-<style>
-  .ex-card{ cursor:pointer; }
-  .ex-head{ display:flex; align-items:center; gap:14px; }
-  .ex-details{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
-  .ex-card.open .ex-details{ max-height:600px; margin-top:18px; }
-  .ex-details ol{ padding-inline-start:20px; margin:0 0 12px; color:var(--text-dim); font-size:.9rem; }
-  .ex-details ol li{ margin-bottom:6px; }
-  .ex-toggle-icon{ transition: transform .25s ease; flex-shrink:0; }
-  .ex-card.open .ex-toggle-icon{ transform: rotate(45deg); color: var(--accent) !important; }
-</style>
 </head>
 <body>
 <div id="navbar-root"></div>
@@ -23,20 +13,103 @@
   <section class="page-hero container">
     <div class="eyebrow" style="justify-content:center;" data-ar="مكتبة التمارين" data-en="Exercise Library">مكتبة التمارين</div>
     <h1 data-ar="اتعلّم الحركة الصحيحة لكل تمرين" data-en="Learn the right form for every move">اتعلّم الحركة الصحيحة لكل تمرين</h1>
-    <p data-ar="اضغط على أي تمرين عشان تشوف خطوات الأداء، الأخطاء الشائعة، وبدائل بدون جهاز." data-en="Tap any exercise to see step-by-step form, common mistakes, and no-equipment alternatives.">اضغط على أي تمرين عشان تشوف خطوات الأداء، الأخطاء الشائعة، وبدائل بدون جهاز.</p>
+    <p data-ar="عرض حركي واقعي لكل تمرين مع خطوات الأداء، الأخطاء الشائعة، والتنفس الصحيح." data-en="Realistic motion guides for every exercise with form steps, common mistakes and breathing cues.">عرض حركي واقعي لكل تمرين مع خطوات الأداء، الأخطاء الشائعة، والتنفس الصحيح.</p>
   </section>
 
   <section class="section-tight">
     <div class="container">
-      <div class="chip-group" id="muscleFilter" style="margin-bottom:14px;"></div>
-      <div class="flex gap-8" style="flex-wrap:wrap; align-items:center; margin-bottom:32px;">
-        <div class="chip-group" id="equipFilter" style="margin:0;"></div>
-        <button class="chip" id="favOnlyChip" style="margin-inline-start:auto;">♥ <span data-ar="المفضلة فقط" data-en="Favorites only">المفضلة فقط</span></button>
+
+      <!-- Toolbar -->
+      <div class="ex-toolbar">
+        <label class="ex-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" id="exSearch" data-ar-ph="ابحث عن تمرين أو عضلة…" data-en-ph="Search exercises or muscles…" placeholder="ابحث عن تمرين أو عضلة…" autocomplete="off">
+        </label>
+        <button class="chip ex-fav-chip" id="favOnlyChip">♥ <span data-ar="المفضلة فقط" data-en="Favorites only">المفضلة فقط</span></button>
       </div>
-      <div class="grid grid-2" id="exGrid"></div>
+
+      <div class="chip-group ex-filter-row" id="muscleFilter"></div>
+      <div class="ex-toolbar-row">
+        <div class="chip-group" id="equipFilter"></div>
+        <span class="ex-count" id="exCount"></span>
+      </div>
+
+      <!-- Grid -->
+      <div class="ex-grid" id="exGrid"></div>
+
+      <!-- Empty state -->
+      <div class="ex-empty hidden" id="exEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8.5 10h.01M15.5 10h.01M9 15c.8-.7 1.9-1 3-1s2.2.3 3 1"/></svg>
+        <h3 data-ar="مفيش نتائج مطابقة" data-en="No matching results">مفيش نتائج مطابقة</h3>
+        <p data-ar="جرّب كلمة بحث مختلفة أو اعمل تصفير للفلاتر." data-en="Try a different search term or reset the filters.">جرّب كلمة بحث مختلفة أو اعمل تصفير للفلاتر.</p>
+        <button class="btn btn-primary btn-sm" id="resetFilters" data-ar="تصفير الفلاتر" data-en="Reset filters">تصفير الفلاتر</button>
+      </div>
     </div>
   </section>
 </main>
+
+<!-- Exercise detail modal -->
+<div class="ex-modal" id="exModal" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-hidden="true">
+  <div class="ex-modal-backdrop" data-close></div>
+  <div class="ex-modal-panel">
+    <button class="ex-modal-close" id="modalClose" data-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <header class="ex-modal-head">
+      <div>
+        <h2 id="mTitle"></h2>
+        <div class="flex gap-8 flex-wrap" id="mBadges"></div>
+      </div>
+      <button class="ex-fav-btn ex-modal-fav" id="mFavBtn" title="favorite">♡</button>
+    </header>
+
+    <div class="ex-modal-grid">
+      <div class="ex-modal-stage-col">
+        <div class="ex-modal-stage"><div id="mStage"></div></div>
+        <div class="ex-controls">
+          <button class="ex-ctl-btn" id="mPlayPause" aria-label="pause">
+            <svg id="icoPause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+            <svg id="icoPlay" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M8 5.5v13a1 1 0 0 0 1.54.84l10-6.5a1 1 0 0 0 0-1.68l-10-6.5A1 1 0 0 0 8 5.5z"/></svg>
+          </button>
+          <div class="ex-speed" id="mSpeed">
+            <button data-s="0.5">0.5×</button>
+            <button data-s="1" class="active">1×</button>
+            <button data-s="1.5">1.5×</button>
+          </div>
+          <span class="ex-rom-hint"><i></i><span data-ar="مسار الحركة" data-en="Range of motion">مسار الحركة</span></span>
+        </div>
+      </div>
+
+      <aside class="ex-modal-info">
+        <div class="ex-tiles">
+          <div class="ex-tile"><span class="ex-tile-k" data-ar="العدات" data-en="Sets">العدات</span><strong id="mSets"></strong></div>
+          <div class="ex-tile"><span class="ex-tile-k" data-ar="التكرار" data-en="Reps">التكرار</span><strong id="mReps"></strong></div>
+          <div class="ex-tile"><span class="ex-tile-k" data-ar="الجهاز" data-en="Equipment">الجهاز</span><strong id="mEquip"></strong></div>
+          <div class="ex-tile"><span class="ex-tile-k" data-ar="المستوى" data-en="Level">المستوى</span><strong id="mLevel"></strong></div>
+        </div>
+        <div class="ex-targets">
+          <h4 data-ar="العضلات المستهدفة" data-en="Target muscles">العضلات المستهدفة</h4>
+          <div class="flex gap-8 flex-wrap" id="mTargets"></div>
+        </div>
+        <div class="alert alert-info ex-breath">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;flex-shrink:0;margin-top:3px;"><path d="M12 3v18M8 7c-2.5 1.5-2.5 4 0 5.5S10.5 16 8 17.5M16 7c2.5 1.5 2.5 4 0 5.5S13.5 16 16 17.5"/></svg>
+          <span><strong data-ar="التنفس:" data-en="Breathing:">التنفس:</strong> <span id="mBreath"></span></span>
+        </div>
+      </aside>
+    </div>
+
+    <section class="ex-modal-section">
+      <h4 data-ar="خطوات الأداء" data-en="How to perform">خطوات الأداء</h4>
+      <ol class="ex-steps" id="mSteps"></ol>
+    </section>
+
+    <div class="ex-modal-alerts">
+      <div class="alert alert-warning"><span id="mMistakes"></span></div>
+      <div class="alert alert-info"><span id="mAlt"></span></div>
+    </div>
+  </div>
+</div>
 
 <div id="footer-root"></div>
 
@@ -44,125 +117,297 @@
 <script src="../js/auth.js"></script>
 <script src="../js/favorites.js"></script>
 <script src="../js/data.js"></script>
-<script src="../js/exercise-animations.js"></script>
 <script src="../js/exercise-media.js"></script>
 <script>
-  let mFilter = 'all', eFilter = 'all', favOnly = false;
-  const equipList = [
-    {id:'all', ar:'الكل', en:'All'}, {id:'none', ar:'بدون جهاز', en:'No Equipment'},
-    {id:'barbell', ar:'بار', en:'Barbell'}, {id:'dumbbell', ar:'دمبل', en:'Dumbbell'},
-    {id:'machine', ar:'جهاز', en:'Machine'}, {id:'cable', ar:'كابل', en:'Cable'},
-  ];
-  const levelBadge = { easy:{ar:'سهل',en:'Easy',cls:'badge-success'}, medium:{ar:'متوسط',en:'Medium',cls:'badge-warning'}, hard:{ar:'صعب',en:'Hard',cls:'badge-danger'} };
+(function(){
+  var mFilter='all', eFilter='all', favOnly=false, query='';
+  var lastFocus=null;
 
+  var EQUIP_LIST=[
+    {id:'all',ar:'الكل',en:'All'},
+    {id:'none',ar:'بدون جهاز',en:'No Equipment'},
+    {id:'barbell',ar:'بار',en:'Barbell'},
+    {id:'dumbbell',ar:'دمبل',en:'Dumbbell'},
+    {id:'machine',ar:'جهاز',en:'Machine'},
+    {id:'cable',ar:'كابل',en:'Cable'}
+  ];
+  var LEVEL={
+    easy:{ar:'سهل',en:'Easy',cls:'badge-success',dot:'easy'},
+    medium:{ar:'متوسط',en:'Medium',cls:'badge-warning',dot:'medium'},
+    hard:{ar:'صعب',en:'Hard',cls:'badge-danger',dot:'hard'}
+  };
+  var CAT={strength:{ar:'قوة',en:'Strength'},cardio:{ar:'كارديو',en:'Cardio'},isometry:{ar:'ثبات',en:'Isometric'}};
+
+  function T(){ /* page strings */
+    return IF.getLang()==='ar'?{
+      motion:'حركة توضيحية', rep:'عدة', hold:'ثبات', details:'التفاصيل',
+      s:x=>x+' تمرين', none:'—'
+    }:{
+      motion:'Motion Guide', rep:'REP', hold:'HOLD', details:'Details',
+      s:x=>x+(x===1?' exercise':' exercises'), none:'—'
+    };
+  }
+  function L(o){return IF.getLang()==='ar'?o.ar:o.en;}
+  function findEx(id){return IF_DATA.exercises.find(x=>x.id===id);}
+
+  /* ---------- filters ---------- */
   function renderFilters(){
-    const lang = IF.getLang();
-    const muscles = [{id:'all', ar:'الكل', en:'All'}, ...IF_DATA.muscleGroups];
-    document.getElementById('muscleFilter').innerHTML = muscles.map(m=>`<button class="chip ${m.id===mFilter?'active':''}" data-m="${m.id}">${lang==='ar'?m.ar:m.en}</button>`).join('');
-    document.getElementById('equipFilter').innerHTML = equipList.map(m=>`<button class="chip ${m.id===eFilter?'active':''}" data-e="${m.id}">${lang==='ar'?m.ar:m.en}</button>`).join('');
+    var lang=IF.getLang();
+    var muscles=[{id:'all',ar:'الكل',en:'All'}].concat(IF_DATA.muscleGroups);
+    document.getElementById('muscleFilter').innerHTML=muscles.map(m=>
+      '<button class="chip '+(m.id===mFilter?'active':'')+'" data-m="'+m.id+'">'+(lang==='ar'?m.ar:m.en)+'</button>').join('');
+    document.getElementById('equipFilter').innerHTML=EQUIP_LIST.map(m=>
+      '<button class="chip '+(m.id===eFilter?'active':'')+'" data-e="'+m.id+'">'+(lang==='ar'?m.ar:m.en)+'</button>').join('');
   }
 
-  function renderExercises(){
-    const lang = IF.getLang();
-    const list = IF_DATA.exercises.filter(x =>
-      (mFilter==='all' || x.muscle===mFilter) && (eFilter==='all' || x.equip===eFilter) && (!favOnly || isFavorite(x.id))
-    );
-    const grid = document.getElementById('exGrid');
+  function matches(x){
+    if(mFilter!=='all'&&x.muscle!==mFilter)return false;
+    if(eFilter!=='all'&&x.equip!==eFilter)return false;
+    if(favOnly&&!isFavorite(x.id))return false;
+    if(query){
+      var lang=IF.getLang(),hay=[x.ar,x.en,x.muscle];
+      IF_DATA.muscleGroups.forEach(g=>{if(g.id===x.muscle){hay.push(g.ar,g.en);}});
+      (x.targets||[]).forEach(t=>hay.push(t.ar,t.en));
+      if(!hay.join(' ').toLowerCase().includes(query))return false;
+    }
+    return true;
+  }
+
+  /* ---------- skeleton ---------- */
+  function renderSkeletons(){
+    var sk='';
+    for(var i=0;i<6;i++){
+      sk+='<div class="card ex-card ex-skel">'
+        +'<div class="ex-media skel-media"></div>'
+        +'<div class="ex-card-body">'
+        +'<div class="skel-line w60"></div>'
+        +'<div class="skel-line w40"></div>'
+        +'<div class="skel-line w90"></div>'
+        +'<div class="skel-line w75"></div>'
+        +'</div></div>';
+    }
+    document.getElementById('exGrid').innerHTML=sk;
+    document.getElementById('exEmpty').classList.add('hidden');
+  }
+
+  /* ---------- cards ---------- */
+  function cardHTML(x,t){
+    var lvl=LEVEL[x.level]||LEVEL.easy;
+    var muscle=IF_DATA.muscleGroups.find(m=>m.id===x.muscle);
+    var cat=CAT[x.cat]||CAT.strength;
+    var isHold=x.cat==='isometry';
+    var fav=isFavorite(x.id);
+    var equipLabel=(EQUIP_LIST.find(e=>e.id===x.equip)||{});equipLabel=L(equipLabel)||x.equip;
+    return ''+
+    '<article class="card ex-card" data-id="'+x.id+'" tabindex="0" role="button" aria-label="'+(IF.getLang()==='ar'?x.ar:x.en)+'">'+
+      '<div class="ex-media">'+
+        '<div class="ex-stage" data-exmotion data-exercise="'+x.id+'"></div>'+
+        '<span class="ex-media-badge"><i></i>'+t.motion+'</span>'+
+        '<span class="ex-lvl-badge '+lvl.dot+'" title="'+L(lvl)+'">'+L(lvl)+'</span>'+
+        (isHold
+          ?'<span class="ex-rep-badge ex-hold-badge">⏱ '+L({ar:'ثبت',en:'Hold'})+'</span>'
+          :'<span class="ex-rep-badge">'+t.rep+' <b data-rep-count>1</b></span>')+
+        '<button class="ex-fav-btn '+(fav?'active':'')+'" data-fav-btn data-id="'+x.id+'" aria-label="favorite">'+(fav?'♥':'♡')+'</button>'+
+      '</div>'+
+      '<div class="ex-card-body">'+
+        '<div class="ex-title-row"><h3>'+(IF.getLang()==='ar'?x.ar:x.en)+'</h3></div>'+
+        '<div class="ex-chips">'+
+          '<span class="badge">'+L(muscle)+'</span>'+
+          '<span class="badge">'+L(cat)+'</span>'+
+          '<span class="badge">'+equipLabel+'</span>'+
+        '</div>'+
+        '<p class="ex-desc">'+(IF.getLang()==='ar'?x.descAr:x.descEn)+'</p>'+
+        '<div class="ex-card-foot">'+
+          '<span class="ex-sets">'+(x.sets||t.none)+' × '+(x.reps||t.none)+'</span>'+
+          '<span class="ex-more">'+t.details+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>'+
+          '</span>'+
+        '</div>'+
+      '</div>'+
+    '</article>';
+  }
+
+  function renderList(){
+    var t=T();
+    var list=IF_DATA.exercises.filter(matches);
+    var grid=document.getElementById('exGrid');
+    var empty=document.getElementById('exEmpty');
+    document.getElementById('exCount').textContent=t.s(list.length);
+
+    IFMotion.destroy(grid);
+
     if(!list.length){
-      grid.innerHTML = `<p class="text-dim">${favOnly ? (lang==='ar'?'لسه مفيش تمارين في المفضلة. اضغط ♥ على أي تمرين عشان تضيفه.':'No favorites yet. Tap ♥ on any exercise to add it.') : (lang==='ar'?'مفيش تمارين مطابقة للفلتر ده.':'No exercises match this filter.')}</p>`;
+      grid.innerHTML='';
+      grid.classList.add('hidden');
+      empty.classList.remove('hidden');
       return;
     }
-    grid.innerHTML = list.map(x => {
-      const lvl = levelBadge[x.level];
-      const pLabel = PATTERN_LABELS[x.pattern];
-      const fav = isFavorite(x.id);
-      return `
-      <div class="card ex-card" data-id="${x.id}" data-reveal>
-        <div class="ex-media">
-          ${getExerciseMedia(x)}
-          <div class="ex-media-badge"><i></i>${lang==='ar'?'حركة توضيحية':'Motion Guide'}</div>
-          <div class="ex-rep-badge" data-rep-badge>${lang==='ar'?'عدة':'REP'} <span data-rep-count>1</span></div>
-          <button class="ex-fav-btn ${fav?'active':''}" data-fav-btn data-id="${x.id}" title="${lang==='ar'?'أضف للمفضلة':'Add to favorites'}">${fav?'♥':'♡'}</button>
-        </div>
-        <div class="ex-card-body">
-          <div class="ex-head">
-            <div style="flex:1;">
-              <h3 style="font-size:1.12rem; margin-bottom:6px;">${lang==='ar'?x.ar:x.en}</h3>
-              <div class="flex gap-8" style="flex-wrap:wrap;">
-                <span class="badge ${lvl.cls}">${lang==='ar'?lvl.ar:lvl.en}</span>
-                <span class="badge">${lang==='ar'? (IF_DATA.muscleGroups.find(m=>m.id===x.muscle)?.ar) : (IF_DATA.muscleGroups.find(m=>m.id===x.muscle)?.en)}</span>
-              </div>
-            </div>
-            <span class="ex-toggle-icon" style="color:var(--text-faint); font-size:1.2rem;">＋</span>
-          </div>
-          <p style="margin:14px 0 0;">${lang==='ar'?x.descAr:x.descEn}</p>
-          <div class="ex-details">
-          <h4 style="font-size:.85rem; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px;">${lang==='ar'?'خطوات الأداء':'How to perform'}</h4>
-          <ol>${(lang==='ar'?x.stepsAr:x.stepsEn).map(s=>`<li>${s}</li>`).join('')}</ol>
-          <div class="alert alert-warning">${lang==='ar'?x.mistakesAr:x.mistakesEn}</div>
-          <div class="alert alert-info">${lang==='ar'?x.altAr:x.altEn}</div>
-        </div>
-      </div>`;
-    }).join('');
+    empty.classList.add('hidden');
+    grid.classList.remove('hidden');
+    grid.innerHTML=list.map(x=>cardHTML(x,t)).join('');
 
-    grid.querySelectorAll('.ex-card').forEach(card=>{
-      card.addEventListener('click', ()=> card.classList.toggle('open'));
+    /* engines + live rep counters */
+    IFMotion.mount(grid,function(media){
+      var b=media.parentNode.querySelector('[data-rep-count]');
+      if(!b)return null;
+      return function(){
+        var n=parseInt(b.textContent,10)||0;
+        b.textContent=n>=4?1:n+1;
+        var badge=media.parentNode.querySelector('.ex-rep-badge');
+        if(badge){badge.classList.remove('rep-bump');void badge.offsetWidth;badge.classList.add('rep-bump');}
+      };
     });
-    grid.querySelectorAll('[data-fav-btn]').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        const id = btn.getAttribute('data-id');
-        const nowFav = toggleFavorite(id);
-        btn.classList.toggle('active', nowFav);
-        btn.textContent = nowFav ? '♥' : '♡';
-        btn.classList.remove('fav-pop'); void btn.offsetWidth; btn.classList.add('fav-pop');
-        if(favOnly && !nowFav) renderExercises();
-      });
-    });
-    initRepCounters(grid);
+
+    bindCards(grid);
     IF.initReveal();
   }
 
-  // عداد عدات حي (Rep Counter) بيتزامن مع أنيميشن كل تمرين — بيدي إحساس إن الحركة حقيقية زي ست تدريب فعلي
-  function initRepCounters(grid){
-    grid.querySelectorAll('.ex-media').forEach(media=>{
-      const motionEl = media.querySelector('.motion-body');
-      const countEl = media.querySelector('[data-rep-count]');
-      if(!motionEl || !countEl) return;
-      let reps = 1;
-      countEl.textContent = reps;
-      motionEl.addEventListener('animationiteration', ()=>{
-        reps = reps >= 4 ? 1 : reps + 1;
-        countEl.textContent = reps;
-        const badge = media.querySelector('[data-rep-badge]');
-        if(badge){ badge.classList.remove('rep-bump'); void badge.offsetWidth; badge.classList.add('rep-bump'); }
+  function bindCards(grid){
+    grid.querySelectorAll('.ex-card').forEach(card=>{
+      card.addEventListener('click',e=>{
+        if(e.target.closest('[data-fav-btn]'))return;
+        openModal(card.getAttribute('data-id'),card);
+      });
+      card.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();openModal(card.getAttribute('data-id'),card);}
+      });
+    });
+    grid.querySelectorAll('[data-fav-btn]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        var id=btn.getAttribute('data-id');
+        var nowFav=toggleFavorite(id);
+        btn.classList.toggle('active',nowFav);
+        btn.textContent=nowFav?'♥':'♡';
+        btn.classList.remove('fav-pop');void btn.offsetWidth;btn.classList.add('fav-pop');
       });
     });
   }
 
-  document.getElementById('muscleFilter').addEventListener('click', e=>{
-    const btn = e.target.closest('.chip'); if(!btn) return;
-    mFilter = btn.getAttribute('data-m'); renderFilters(); renderExercises();
-  });
-  document.getElementById('equipFilter').addEventListener('click', e=>{
-    const btn = e.target.closest('.chip'); if(!btn) return;
-    eFilter = btn.getAttribute('data-e'); renderFilters(); renderExercises();
-  });
-  document.getElementById('favOnlyChip').addEventListener('click', ()=>{
-    favOnly = !favOnly;
-    document.getElementById('favOnlyChip').classList.toggle('active', favOnly);
-    renderExercises();
+  /* ---------- modal ---------- */
+  var modalEl=document.getElementById('exModal');
+
+  function openModal(id,trigger){
+    var x=findEx(id);if(!x)return;
+    lastFocus=trigger||null;
+    var lang=IF.getLang(),lvl=LEVEL[x.level],cat=CAT[x.cat];
+    var muscle=IF_DATA.muscleGroups.find(m=>m.id===x.muscle);
+    var equip=EQUIP_LIST.find(e=>e.id===x.equip)||{ar:x.equip,en:x.equip};
+
+    document.getElementById('mTitle').textContent=lang==='ar'?x.ar:x.en;
+    document.getElementById('mBadges').innerHTML=
+      '<span class="badge '+lvl.cls+'">'+L(lvl)+'</span>'+
+      '<span class="badge">'+L(cat)+'</span>'+
+      '<span class="badge">'+L(muscle)+'</span>';
+
+    document.getElementById('mSets').textContent=x.sets||T().none;
+    document.getElementById('mReps').textContent=x.reps||T().none;
+    document.getElementById('mEquip').textContent=L(equip);
+    document.getElementById('mLevel').textContent=L(lvl);
+    document.getElementById('mBreath').textContent=lang==='ar'?x.breathAr:x.breathEn;
+    document.getElementById('mTargets').innerHTML=(x.targets||[]).map(tg=>'<span class="badge badge-accent">'+(lang==='ar'?tg.ar:tg.en)+'</span>').join('');
+    document.getElementById('mSteps').innerHTML=(lang==='ar'?x.stepsAr:x.stepsEn).map(s=>'<li>'+s+'</li>').join('');
+    document.getElementById('mMistakes').textContent=lang==='ar'?x.mistakesAr:x.mistakesEn;
+    document.getElementById('mAlt').textContent=(lang==='ar'?'بدائل: ':'Alternatives: ')+(lang==='ar'?x.altAr:x.altEn);
+
+    var favBtn=document.getElementById('mFavBtn');
+    var syncFav=function(){var f=isFavorite(x.id);favBtn.classList.toggle('active',f);favBtn.textContent=f?'♥':'♡';};
+    syncFav();
+    favBtn.onclick=function(){toggleFavorite(x.id);syncFav();};
+
+    /* fresh motion engine */
+    IFMotion.destroy(document.getElementById('mStage'));
+    var stageHost=document.createElement('div');
+    stageHost.setAttribute('data-exmotion','');
+    stageHost.setAttribute('data-exercise',x.id);
+    document.getElementById('mStage').innerHTML='';
+    document.getElementById('mStage').appendChild(stageHost);
+    IFMotion.mount(stageHost.parentNode);
+
+    resetControls();
+
+    modalEl.classList.add('open');
+    modalEl.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    document.getElementById('modalClose').focus();
+  }
+
+  function closeModal(){
+    modalEl.classList.remove('open');
+    modalEl.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    IFMotion.destroy(document.getElementById('mStage'));
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+
+  function resetControls(){
+    var inst=IFMotion.get(document.querySelector('#mStage [data-exmotion]'));
+    var pp=document.getElementById('mPlayPause');
+    pp.classList.remove('paused');
+    pp.setAttribute('aria-label','pause');
+    document.getElementById('icoPause').style.display='';
+    document.getElementById('icoPlay').style.display='none';
+    document.querySelectorAll('#mSpeed button').forEach(b=>b.classList.toggle('active',b.getAttribute('data-s')==='1'));
+    if(inst)inst.setSpeed(1);
+  }
+
+  modalEl.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeModal();});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&modalEl.classList.contains('open'))closeModal();
   });
 
-  // لو المستخدم فتح الصفحة بلينك فيه #favorites (مثلاً من صفحة البروفايل)، نفعّل فلتر المفضلة تلقائيًا
-  if(location.hash === '#favorites'){
-    favOnly = true;
+  document.getElementById('mPlayPause').addEventListener('click',function(){
+    var inst=IFMotion.get(document.querySelector('#mStage [data-exmotion]'));
+    if(!inst)return;
+    var paused=this.classList.toggle('paused');
+    if(paused)inst.pause();else inst.play();
+    this.setAttribute('aria-label',paused?'play':'pause');
+    document.getElementById('icoPause').style.display=paused?'none':'';
+    document.getElementById('icoPlay').style.display=paused?'':'none';
+  });
+  document.getElementById('mSpeed').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-s]');if(!b)return;
+    this.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    var inst=IFMotion.get(document.querySelector('#mStage [data-exmotion]'));
+    if(inst)inst.setSpeed(parseFloat(b.getAttribute('data-s')));
+  });
+
+  /* ---------- toolbar events ---------- */
+  document.getElementById('muscleFilter').addEventListener('click',e=>{
+    var btn=e.target.closest('.chip');if(!btn)return;
+    mFilter=btn.getAttribute('data-m');renderFilters();renderList();
+  });
+  document.getElementById('equipFilter').addEventListener('click',e=>{
+    var btn=e.target.closest('.chip');if(!btn)return;
+    eFilter=btn.getAttribute('data-e');renderFilters();renderList();
+  });
+  document.getElementById('favOnlyChip').addEventListener('click',function(){
+    favOnly=!favOnly;this.classList.toggle('active',favOnly);renderList();
+  });
+  document.getElementById('exSearch').addEventListener('input',function(){
+    query=this.value.trim().toLowerCase();renderList();
+  });
+  document.getElementById('resetFilters').addEventListener('click',function(){
+    mFilter='all';eFilter='all';query='';favOnly=false;
+    document.getElementById('exSearch').value='';
+    document.getElementById('favOnlyChip').classList.remove('active');
+    renderFilters();renderList();
+  });
+
+  /* deep-link from profile: #favorites */
+  if(location.hash==='#favorites'){
+    favOnly=true;
     document.getElementById('favOnlyChip').classList.add('active');
   }
 
-  renderFilters(); renderExercises();
-  document.addEventListener('if:langchange', ()=>{ renderFilters(); renderExercises(); });
-  document.addEventListener('if:favoriteschange', ()=>{ if(favOnly) renderExercises(); });
+  /* ---------- boot ---------- */
+  renderFilters();
+  renderSkeletons();
+  setTimeout(renderList,450);
+  document.addEventListener('if:langchange',function(){renderFilters();renderList();});
+  document.addEventListener('if:favoriteschange',function(){if(favOnly)renderList();});
+})();
 </script>
 </body>
 </html>
